@@ -8,10 +8,15 @@ For individual hobbyists who are interested in the potential applications of dat
 
 ## Personas
 
-1. Stock market enthusiast
-2. Data science/machine learning enthusiast
-3. Wallstreetbets memer
-4. Investers looking to familiarize themselves with the impact that social media posting has on trades
+* personalization
+* job-related
+* education
+* relevance
+
+1. Stock market enthusiast, blue-collar worker looking to make some more money and learn about investing, wants to familiarize himself with trading strategies for financial purposes
+2. Data science/machine learning enthusiast, college student in related major, interested in the open-source project for educational purposes
+3. Wallstreetbets memer, following stock market trends as a hobby for social conversational/entertainment purposes
+4. Old, out-of-touch/tradionalist invester looking to familiarize themselves with the new impact that social media posting has on trades
 5. some fifth guy?
 
 ## Feature List
