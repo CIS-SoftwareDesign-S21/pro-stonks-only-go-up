@@ -27,5 +27,6 @@ For individual hobbyists who are interested in the potential applications of dat
 * Paper trading interface using Alpaca API
 
 Link to  a feature list (backlog / use cases) for the whole project for your project board.
+[Project Board](https://trello.com/b/mm51f6Tv/stonks-only-go-up)
 
 ## How to Install
