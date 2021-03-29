@@ -8,12 +8,19 @@ For individual hobbyists who are interested in the potential applications of dat
 
 ## Personas
 
-1. text
-2. text
-3. text
-4. text
-5. text
+1. Stock market enthusiast
+2. Data science/machine learning enthusiast
+3. Wallstreetbets memer
+4. Investers looking to familiarize themselves with the impact that social media posting has on trades
+5. some fifth guy?
 
 ## Feature List
+
+* Scrape information from Reddit
+* Scrape information from Twitter
+* Perform sentiment analysis on social media data
+* Paper trading interface using Alpaca API
+
+Link to  a feature list (backlog / use cases) for the whole project for your project board.
 
 ## How to Install
