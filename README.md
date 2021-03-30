@@ -34,10 +34,9 @@ Having worked at a bank for most of his career, Harold has heard his fair share 
 
 #### 5. pump and dump man
 
-* personalization
-* job-related
-* education
-* relevance
+Bobby age 25 is sick of his low paying job and is enamored with the Instragram lifestyle of those who are young and rich. He followed to crowd and went to college to obtain a degree but it has not resulted in a profitable career and he remains underemployed. Since Bobby is adept at social media or faking it until you make it he decides to create an online persona in order to manipulate the market. Using his savings, he hires a set of people to curate a fake life for himself, posing in front of private jets and luxury goods he build ups a following as a young guru of the stock market. 
+
+Since Bobby is all about the quick cash grab he looks at low market cap stocks and what has postive sentiment but low volume of posts. He believes that he can purchase large amounts of shares of these stocks that people are positive on but are not hyping then use his social media following to drive the price up. This will make him see like a prophet since the prices rise after posting and he can make a tidy profit as his investments rise. 
 
 ## Feature List
 
