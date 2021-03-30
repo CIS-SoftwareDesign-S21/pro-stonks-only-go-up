@@ -15,6 +15,7 @@ For individual hobbyists who are interested in the potential applications of dat
 
 1. Stock market enthusiast, blue-collar worker looking to make some more money and learn about investing, wants to familiarize himself with trading strategies for financial purposes
 2. Data science/machine learning enthusiast, college student in related major, interested in the open-source project for educational/financial purposes
+
 John, age 23, is a junior at Temple University majoring Computer Science with a Data Science Minor. He was working as a waiter at a local pizzeria to earn some money to help pay for his tuition but lost his job due to the pandemic. John has been eyeing the stock market for some time now and realized it was a reasonable time to start investing due to the economic impact caused by Covid-19. 
 John has developed a solid background in data science and machine learning and feels that he is ready to start a new chapter in the stock market industry. He is in search for a user-friendly platform where he can test out his studies and proceed with a multiple demo runs before investing real funds. John is confident that with his previous education in data science might be beneficial with algorithm trading and testing. 
 
