@@ -10,8 +10,7 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
-df = pd.read_csv(
-    r'/home/venturizhou/python/cis3296/pro-stonks-only-go-up/GME.csv')
+df = pd.read_csv('GME.csv')
 
 fig = go.Figure()
 
