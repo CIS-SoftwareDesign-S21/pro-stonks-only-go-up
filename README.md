@@ -22,6 +22,11 @@ For individual hobbyists who are interested in the potential applications of dat
 
 3. Wallstreetbets memer, following stock market trends as a hobby for social conversational/entertainment purposes
 4. Old, out-of-touch/tradionalist invester looking to familiarize themselves with the new impact that social media posting has on trades
+
+  Harold, age 65, is a retired bank teller with a moderately-sized nest egg which he grew from long-term, traditional, investing practices. He had some trouble adapting when his bank went digital, but became proficient at using simple data entry and organization software. However, his computer skills do not extend much further, as the concept of the internet is a bit confusing for him. He prefers the paper and television-based news sources for obtaining the latest stock information. When in doubt, he'll call his broker.
+
+  Having worked at a bank for most of his career, Harold has heard his fair share of investment advice. With day-trading being faster-paced than ever, Harold feels that he needs to listen in on the online conversation to keep up with young investors. Wanting to keep busy and to grow his retirement fund without breaking his back, Harold seeks out a simplified way of keeping up with the social-media influence that has taken over the world of day-trading. He feels that if he can understand the impact that social media posts have on stocks, he can apply his conventional trading knowledge to make some money.
+
 5. some fifth guy?
 
 ## Feature List
