@@ -32,7 +32,7 @@ Harold, age 65, is a retired bank teller with a moderately-sized nest egg which 
 
 Having worked at a bank for most of his career, Harold has heard his fair share of investment advice. With day-trading being faster-paced than ever, Harold feels that he needs to listen in on the online conversation to keep up with young investors. Wanting to keep busy and to grow his retirement fund without breaking his back, Harold seeks out a simplified way of keeping up with the social-media influence that has taken over the world of day-trading. He feels that if he can understand the impact that social media posts have on stocks, he can apply his conventional trading knowledge to make some money.
 
-#### 5. pump and dump man
+#### 5. Bobby
 
 Bobby age 25 is sick of his low paying job and is enamored with the Instragram lifestyle of those who are young and rich. He followed to crowd and went to college to obtain a degree but it has not resulted in a profitable career and he remains underemployed. Since Bobby is adept at social media or faking it until you make it he decides to create an online persona in order to manipulate the market. Using his savings, he hires a set of people to curate a fake life for himself, posing in front of private jets and luxury goods he build ups a following as a young guru of the stock market. 
 
