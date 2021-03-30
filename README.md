@@ -20,7 +20,13 @@ John, age 23, is a junior at Temple University majoring Computer Science with a 
   
 John has developed a solid background in data science and machine learning and feels that he is ready to start a new chapter in the stock market industry. He is in search for a user-friendly platform where he can test out his studies and proceed with a multiple demo runs before investing real funds. John is confident that with his previous education in data science might be beneficial with algorithm trading and testing. 
 
-#### 3. Adam
+3. Wallstreetbets memer, following stock market trends as a hobby for social conversational/entertainment purposes
+
+  Adam, age 18, is a freshman at Temple university majoring in Business. He just graduated high school and was the start quarterback for the last three years for his highschool. Aside from spending a few hours a week helping his dad out with the family business Adam likes to spend his time scrolling throw TikTok and other social media applications to pass the time. Adam hopes to run his own business while also being a social media influencer.
+
+  Adam has been a hardcore reddit user since middle school and was always a part of the community. He's understood how it works and is a member of a few big groups. He is a member of the WallStreetBets subreddit and has been following the GameStop & AMC hypetrain since the beginning. He follows the reddit page on a daily to know whats going on in the market and hold conversation with other people in his major. He is paticularly interested in the next big short squeeze and sees the stock market more as a hobby than a career.
+
+4. Old, out-of-touch/tradionalist invester looking to familiarize themselves with the new impact that social media posting has on trades
 
 Adam, age 18, is a freshman at Temple university majoring in Business. He just graduated high school and was the start quarterback for the last three years for his highschool. Aside from spending a few hours a week helping his dad out with the family business Adam likes to spend his time scrolling throw TikTok and other social media applications to pass the time. Adam hopes to run his own business while also being a social media influencer.
 
