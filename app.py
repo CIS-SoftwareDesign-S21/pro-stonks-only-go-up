@@ -10,6 +10,17 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
+df = pd.read_csv(
+    r'/home/venturizhou/python/cis3296/pro-stonks-only-go-up/GME.csv')
+
+fig = go.Figure()
+
+fig.add_trace(go.Scatter(x=df['Date'],y=df['Close'],
+                        mode = 'lines',
+                        name = 'GME'))
+
+fig.show()
+
 app.layout = html.Div(children=[
     html.H1(children='Stonks only go Up'),
 
@@ -29,6 +40,10 @@ app.layout = html.Div(children=[
         ],
         value='MTL',
         labelStyle={'display': 'inline-block'}
+    ),
+    dcc.Graph(
+        id='GME Historical',
+        figure=fig
     )
 
 ]
