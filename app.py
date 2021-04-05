@@ -5,21 +5,20 @@ import plotly.express as px
 import pandas as pd
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output
+import reddit_scraper
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 df = pd.read_csv(
-    r'/home/venturizhou/python/cis3296/pro-stonks-only-go-up/GME.csv')
+    r'GME.csv')
 
 fig = go.Figure()
 
 fig.add_trace(go.Scatter(x=df['Date'],y=df['Close'],
                         mode = 'lines',
                         name = 'GME'))
-
-fig.show()
 
 app.layout = html.Div(children=[
     html.H1(children='Stonks only go Up'),
@@ -44,10 +43,36 @@ app.layout = html.Div(children=[
     dcc.Graph(
         id='GME Historical',
         figure=fig
+    ),
+    html.H2(children='Recent Relevant Post Titles (250)'),
+    html.Button('Query Reddit for Selected Stock Posts', id='update_titles', n_clicks=0),
+    dcc.Dropdown(
+        id='ticker-dropdown',
+        options=[
+            {'label': 'Gamestop', 'value': 'gme'},
+            {'label': 'Tesla', 'value': 'tsla'}
+        ],
+        value='gme'
+    ),
+    html.Div(children="init",
+        style={"maxHeight": "400px", "overflow": "scroll"},
+        id='gme_titles_listbox'
     )
+])
 
-]
+@app.callback(
+    dash.dependencies.Output('gme_titles_listbox', 'children'),
+    [dash.dependencies.Input('update_titles', 'n_clicks')],
+    [dash.dependencies.Input('ticker-dropdown', 'value')]
 )
+def update_gme_titles(n_clicks, ticker):
+    print("Searching for " + ticker)
+    newTitles = reddit_scraper.search_reddit_titles(ticker)
+    
+    newList = html.Ul([html.Li(x) for x in newTitles])
+    print("Updating titles for ticker")
+
+    return newList
 
 if __name__ == '__main__':
     app.run_server(debug=True)
