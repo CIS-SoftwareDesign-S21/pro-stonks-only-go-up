@@ -1,15 +1,17 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_bootstrap_components as dbc
 import plotly.express as px
 import pandas as pd
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output
 import reddit_scraper
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+# external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(__name__)
+app.server.assets_folder = 'assets'
 
 df = pd.read_csv(
     r'GME.csv')
@@ -21,12 +23,10 @@ fig.add_trace(go.Scatter(x=df['Date'],y=df['Close'],
                         name = 'GME'))
 
 app.layout = html.Div(children=[
-    html.H1(children='Stonks only go Up'),
+    html.H1(children='Stonks only go Up',className = "app-header--title"),
 
-    html.Div(children='''
-        Social media sentiment and historical prices of stonks.
-    '''),
-
+   html.H3(children='Social Media Sentiment and Historical Prices of Stonks'),
+    
     # dcc.Input(
     #     id="input_text",
     #     type="text",
