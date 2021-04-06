@@ -14,8 +14,11 @@ def __exec(stmt, args):
         else:
             print(err)
     else:
-        cursor = cnx.cursor
-        cursor.execute(stmt, args)
+        cursor = cnx.cursor()
+        try:
+            cursor.execute(stmt, args)
+        except mysql.connector.Error as err:
+            print(err)
         result = cursor.fetchall() # might cause problems if fetching a lot of data?
         cursor.close()
         cnx.close()
@@ -26,20 +29,20 @@ def insert_reddit_post(ticker, title):
     __exec(("INSERT INTO reddit_post "
             "(post_ticker, post_title) "
             "VALUES (%s, %s)"),
-            (ticker, title))
+            (ticker.upper(), title))
 
 def insert_twitter_post(ticker, content):
     __exec(("INSERT INTO twitter_post "
             "(post_ticker, post_content) "
             "VALUES (%s, %s)"),
-            (ticker, content))
+            (ticker.upper(), content))
 
 def get_reddit_posts(ticker):
     return __exec(("SELECT post_title FROM reddit_post "
                     "WHERE post_ticker=%s"),
-                    (ticker))
+                    (ticker.upper()))
 
 def get_twitter_posts(ticker):
     return __exec(("SELECT post_content FROM twitter_post "
                     "WHERE post_ticker=%s"),
-                    (ticker))
+                    (ticker.upper()))
