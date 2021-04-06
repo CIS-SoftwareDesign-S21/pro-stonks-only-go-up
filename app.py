@@ -22,6 +22,14 @@ app.layout = html.Div(style={"margin": "15px"}, children=[
 
     # graphs
     html.H3(children='Social Media Sentiment and Historical Prices of Stonks'),
+
+   html.H3(children='Social Media Sentiment and Historical Prices of Stonks'),
+    
+    # dcc.Input(
+    #     id="input_text",
+    #     type="text",
+    #     placeholder="input type text",
+    # ),
     dcc.RadioItems(
         id='Stonks',
         options=[
