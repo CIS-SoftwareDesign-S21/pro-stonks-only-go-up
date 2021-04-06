@@ -1,7 +1,8 @@
+__pycache__
+praw.ini
 /venv
 *config.py
 praw.ini
 gme_titles.txt
 tsla_titles.txt
-/__pycache__
 /.vscode
