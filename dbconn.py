@@ -39,10 +39,10 @@ def insert_twitter_post(ticker, content):
 
 def get_reddit_posts(ticker):
     return __exec(("SELECT post_title FROM reddit_post "
-                    "WHERE post_ticker=%s"),
-                    (ticker.upper()))
+                    "WHERE post_ticker = %s"),
+                    (ticker.upper(), ))
 
 def get_twitter_posts(ticker):
     return __exec(("SELECT post_content FROM twitter_post "
-                    "WHERE post_ticker=%s"),
-                    (ticker.upper()))
+                    "WHERE post_ticker = %s"),
+                    (ticker.upper(), ))

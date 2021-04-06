@@ -1,6 +1,9 @@
 import dbconn
 
-f = open('gme_titles.txt', 'r', encoding='utf8')
-for line in f:
-    dbconn.insert_reddit_post('GME', line.strip())
-print("DONE")
+
+# f = open('gme_titles.txt', 'r', encoding='utf8')
+# for line in f:
+#     dbconn.insert_reddit_post('GME', line.strip())
+# print("DONE")
+
+print(dbconn.get_reddit_posts('TSLA'))

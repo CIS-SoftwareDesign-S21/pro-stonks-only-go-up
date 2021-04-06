@@ -6,6 +6,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output
 import reddit_scraper
+import dbconn
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -57,6 +58,11 @@ app.layout = html.Div(children=[
     html.Div(children="init",
         style={"maxHeight": "400px", "overflow": "scroll"},
         id='gme_titles_listbox'
+    ),
+    
+    html.H2(children='Reddit Posts stored in Database matching GME'),
+    html.Div(children=[html.Li(post[0]+'\n') for post in dbconn.get_reddit_posts("GME")],
+        style={"maxHeight": "400px", "overflow": "scroll"}
     )
 ])
 
