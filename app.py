@@ -30,6 +30,8 @@ app.layout = html.Div(children=[
 
     html.H3(children='Social Media Sentiment and Historical Prices of Stonks'),
 
+   html.H3(children='Social Media Sentiment and Historical Prices of Stonks'),
+    
     # dcc.Input(
     #     id="input_text",
     #     type="text",
