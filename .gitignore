@@ -3,6 +3,4 @@ praw.ini
 /venv
 *config.py
 praw.ini
-gme_titles.txt
-tsla_titles.txt
 /.vscode
