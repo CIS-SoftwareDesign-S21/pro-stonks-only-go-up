@@ -6,6 +6,7 @@ import plotly.express as px
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
+from nltk.sentiment.vader import SentimentIntensityAnalyzer as SIA
 from dash.dependencies import Input, Output
 import reddit_scraper
 
@@ -24,10 +25,10 @@ app.server.assets_folder = 'assets'
 #                         name = 'GME'))
 
 app.layout = html.Div(children=[
-    html.H1(children='Stonks only go Up',className = "app-header--title"),
+    html.H1(children='Stonks only go Up', className="app-header--title"),
 
-   html.H3(children='Social Media Sentiment and Historical Prices of Stonks'),
-    
+    html.H3(children='Social Media Sentiment and Historical Prices of Stonks'),
+
     # dcc.Input(
     #     id="input_text",
     #     type="text",
@@ -45,8 +46,10 @@ app.layout = html.Div(children=[
     dcc.Graph(
         id='Historical',
     ),
+    html.Div("Sentiment: ", id="Sentiment"),
     html.H2(children='Recent Relevant Post Titles (250)'),
-    html.Button('Query Reddit for Selected Stock Posts', id='update_titles', n_clicks=0),
+    html.Button('Query Reddit for Selected Stock Posts',
+                id='update_titles', n_clicks=0),
     dcc.Dropdown(
         id='ticker-dropdown',
         options=[
@@ -56,10 +59,11 @@ app.layout = html.Div(children=[
         value='gme'
     ),
     html.Div(children="init",
-        style={"maxHeight": "400px", "overflow": "scroll"},
-        id='gme_titles_listbox'
-    )
+             style={"maxHeight": "400px", "overflow": "scroll"},
+             id='gme_titles_listbox'
+             )
 ])
+
 
 @app.callback(Output('Historical', 'figure'),
               [Input('Stonks', 'value')])
@@ -95,16 +99,18 @@ def render_charts(stonk):
                               name='TSLA'))
 
     fig2.add_trace(go.Scatter(x=df2['Date'], y=np.random.rand(len(df['Date']))*df2['Close'].max(),
-                             mode='lines',
-                             name='Sentiment',
-                             opacity=0.3))
+                              mode='lines',
+                              name='Sentiment',
+                              opacity=0.3))
 
     if stonk == 'GME':
         return fig
     elif stonk == 'TSLA':
         return fig2
 
+
 @app.callback(
+    dash.dependencies.Output('Sentiment', 'children'),
     dash.dependencies.Output('gme_titles_listbox', 'children'),
     [dash.dependencies.Input('update_titles', 'n_clicks')],
     [dash.dependencies.Input('ticker-dropdown', 'value')]
@@ -112,11 +118,32 @@ def render_charts(stonk):
 def update_gme_titles(n_clicks, ticker):
     print("Searching for " + ticker)
     newTitles = reddit_scraper.search_reddit_titles(ticker)
+
+    sia = SIA()
+    results = []
+    for title in newTitles:
+        title = title.strip('\n')
+        pol_score = sia.polarity_scores(title)
+        pol_score['headline'] = title
+        results.append(pol_score)
     
+    df = pd.DataFrame.from_records(results)
+    df['label'] = 0
+    df.loc[df['compound'] > 0.2, 'label'] = 1
+    df.loc[df['compound'] < -0.2, 'label'] = -1
+
+    if df.label.sum() > 0:
+        sentiment = "Sentiment: Positive"
+    elif df.label.sum() < 0:
+        sentiment = "Sentiment: Negative"
+    else: 
+        sentiment = "Sentiment: Neutral"
+
     newList = html.Ul([html.Li(x) for x in newTitles])
     print("Updating titles for ticker")
 
-    return newList
+    return sentiment, newList
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
