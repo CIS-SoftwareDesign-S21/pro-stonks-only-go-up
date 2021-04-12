@@ -48,7 +48,7 @@ app.layout = html.Div(children=[
         id='Historical',
     ),
     html.Div("Sentiment: ", id="Sentiment"),
-    html.H2(children='Recent Relevant Post Titles (250)'),
+    html.H2(children='Recent Relevant Reddit Posts (500)'),
     html.Button('Query Reddit for Selected Stock Posts',
                 id='update_titles', n_clicks=0),
     dcc.Dropdown(
@@ -123,12 +123,13 @@ def render_charts(stonk):
 )
 def update_gme_titles(n_clicks, ticker):
     print("Searching for " + ticker)
-    newTitles = reddit_scraper.search_reddit_titles(ticker)
+    newPosts = reddit_scraper.search_pushshift_titles(ticker, 500, 0)
+    #newPosts = reddit_scraper.search_reddit_titles(ticker)
 
     sia = SIA()
     results = []
-    for title in newTitles:
-        title = title.strip('\n')
+    for post in newPosts:
+        title = post[1].strip('\n')
         pol_score = sia.polarity_scores(title)
         pol_score['headline'] = title
         results.append(pol_score)
@@ -145,8 +146,7 @@ def update_gme_titles(n_clicks, ticker):
     else: 
         sentiment = "Sentiment: Neutral"
 
-    newList = html.Ul([html.Li(x) for x in newTitles])
-    print("Updating titles for ticker")
+    newList = html.Ul([html.Li("TITLE: " + x[0] + " | POST CONTENT:" + x[1]) for x in newPosts])
 
     return sentiment, newList
 
