@@ -53,6 +53,13 @@ app.layout = html.Div(style={"margin": "15px"}, children=[
         value='reddit',
         style={"display": "inline-block", "width": "200px"}
     ),
+    html.Div("Sentiment: ", id="Sentiment"),
+    dcc.Graph(
+        id='Sentiment_Graph',
+    ),
+    html.H2(children='Recent Relevant Reddit Posts (500)'),
+    html.Button('Query Reddit for Selected Stock Posts',
+                id='update_titles', n_clicks=0),
     dcc.Dropdown(
         id='scraper-ticker',
         options=[
@@ -238,6 +245,7 @@ def sentiment_analysis(posts):
     else: 
         return "Sentiment: Neutral"
 
+# def sentiment_graph(sent_df):
 
 if __name__ == '__main__':
     app.run_server(debug=True)
