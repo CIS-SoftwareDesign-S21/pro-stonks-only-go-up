@@ -13,9 +13,8 @@ import dbconn
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-app = dash.Dash(__name__)
+app = dash.Dash(__name__, title = 'Stonks Only Go Up 📈', update_title = 'Collecting Data...')
 app.server.assets_folder = 'assets'
-
 # df = pd.read_csv(
 #     r'GME.csv')
 
@@ -27,8 +26,11 @@ app.server.assets_folder = 'assets'
 
 app.layout = html.Div(children=[
     html.H1(children='Stonks only go Up', className="app-header--title"),
-
+    
+    html.Img(src=app.get_asset_url('stonks.jpg'), style = {'padding-left': '90%', 'height': '10%', 'width': '10%', 'display': 'inline-block'}),
+    
     html.H3(children='Social Media Sentiment and Historical Prices of Stonks'),
+
 
     # dcc.Input(
     #     id="input_text",
