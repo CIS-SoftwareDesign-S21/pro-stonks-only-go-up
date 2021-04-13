@@ -129,7 +129,7 @@ def update_gme_titles(n_clicks, ticker):
     sia = SIA()
     results = []
     for post in newPosts:
-        title = post[1].strip('\n')
+        title = post[0].strip('\n')
         pol_score = sia.polarity_scores(title)
         pol_score['headline'] = title
         results.append(pol_score)
