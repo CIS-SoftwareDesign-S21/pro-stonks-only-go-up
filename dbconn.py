@@ -19,16 +19,22 @@ def __exec(stmt, args):
             cursor.execute(stmt, args)
         except mysql.connector.Error as err:
             print(err)
-        result = cursor.fetchall() # might cause problems if fetching a lot of data?
-        cursor.close()
-        cnx.close()
-        return result
+        try:
+            result = cursor.fetchall() # might cause problems if fetching a lot of data?
+            cursor.close()
+            cnx.close()
+            return result
+        except mysql.connector.Error as err:
+            print(err)
+        else:
+            cursor.close()
+            cnx.close()
         
 
 def insert_reddit_post(ticker, title, content): 
     __exec(("INSERT INTO reddit_post "
             "(post_ticker, post_title, post_content) "
-            "VALUES (%s, %s)"),
+            "VALUES (%s, %s, %s)"),
             (ticker.upper(), title, content))
 
 def insert_twitter_post(ticker, content):

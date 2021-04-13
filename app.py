@@ -51,9 +51,9 @@ app.layout = html.Div(style={"margin": "15px"},
     ),
     
     # searching interface
-    html.H2(children='Recent Relevant Reddit Posts (500)'),
-    html.Button('Refresh',
-                id='scraper-refresh', n_clicks=0),
+    html.H2(children='Recent Relevant Reddit Posts (100)'),
+    html.H3("Sentiment: ", id="scraper-sentiment"),
+    html.Button('Refresh',id='scraper-refresh'),
     dcc.Dropdown(
         id='scraper-dropdown',
         options=[
@@ -62,14 +62,17 @@ app.layout = html.Div(style={"margin": "15px"},
         ],
         value='gme'
     ),
-    html.Div("Sentiment: ", id="scraper-sentiment"),
     html.Div(children="init",
         style={"maxHeight": "400px", "overflow": "scroll"},
         id='scraper-listbox'
     ),
+    html.Button('Save', id='save-button'),
+    html.Span(id='save-result'),
     
     # database interface
     html.H2(children='Reddit Posts stored in Database matching GME'),
+    html.H3("Sentiment: ", id="db-sentiment"),
+    html.Button('Refresh',id='db-refresh'),
     dcc.Dropdown(
         id='db-dropdown',
         options=[
@@ -78,7 +81,6 @@ app.layout = html.Div(style={"margin": "15px"},
         ],
         value='gme'
     ),
-    html.Div("Sentiment: ", id="db-sentiment"),
     html.Div(children='init',
         style={"maxHeight": "400px", "overflow": "scroll"},
         id='db-listbox'
@@ -128,16 +130,18 @@ def render_charts(stonk):
         return fig2
 
 
-# callback for search dropdown
+# callback for scraper dropdown
 @app.callback(
     dash.dependencies.Output('scraper-sentiment', 'children'),
     dash.dependencies.Output('scraper-listbox', 'children'),
     [dash.dependencies.Input('scraper-refresh', 'n_clicks')],
     [dash.dependencies.Input('scraper-dropdown', 'value')]
 )
-def update_gme_titles(n_clicks, ticker):
+def update_scraper_box(n_clicks, ticker):
     print("Searching for " + ticker + " in scraper")
-    newPosts = reddit_scraper.search_pushshift_titles(ticker, 50, 0)
+    newPosts = reddit_scraper.search_pushshift_titles(ticker, 100, 0)
+    scrapedPosts = newPosts
+    scrapedTicker = ticker
     # newPosts = reddit_scraper.search_reddit_titles(ticker)
 
     sia = SIA()
@@ -160,7 +164,7 @@ def update_gme_titles(n_clicks, ticker):
     else: 
         sentiment = "Sentiment: Neutral"
 
-    print('Updating titles for scraper box')
+    print('Updating table for scraper box')
     table = html.Table([
         html.Thead(
             html.Tr([html.Th("TITLE"), html.Th("CONTENT")])
@@ -173,15 +177,36 @@ def update_gme_titles(n_clicks, ticker):
     return sentiment, table
 
 
+# callback for save button
+@app.callback(
+    dash.dependencies.Output('save-result', 'children'),
+    [dash.dependencies.Input('save-button', 'n_clicks')],
+    [dash.dependencies.Input('scraper-listbox', 'children')],
+    [dash.dependencies.Input('scraper-dropdown', 'value')]
+)
+def save_posts(n_clicks, table, ticker):
+    ctx = dash.callback_context
+    if ctx.triggered[0]['prop_id'].split('.')[0] == 'save-button':
+        # print(table['props']['children'])
+        print("Saving Posts")
+        tableBody = table['props']['children'][1]
+        for tableRow in tableBody['props']['children']:
+            tds = tableRow['props']['children']
+            dbconn.insert_reddit_post(ticker, tds[0]['props']['children'], tds[1]['props']['children'])
+        print("Saving Done")
+        return "Saved " + str(len(tableBody['props']['children'])) + " posts"
+
+
 # callback for database dropdown
 @app.callback(
     dash.dependencies.Output('db-sentiment', 'children'),
     dash.dependencies.Output('db-listbox', 'children'),
+    [dash.dependencies.Input('scraper-refresh', 'n_clicks')],
     [dash.dependencies.Input('db-dropdown', 'value')]
 )
-def update_db_box(ticker):
+def update_db_box(n_clicks, ticker):
     print("Searching for " + ticker + " in db")
-    newPosts = dbconn.get_reddit_posts('GME')
+    newPosts = dbconn.get_reddit_posts(ticker)
 
     sia = SIA()
     results = []
@@ -203,7 +228,7 @@ def update_db_box(ticker):
     else: 
         sentiment = "Sentiment: Neutral"
 
-    print("Updating titles for db box")
+    print("Updating table for db box")
     table = html.Table([
         html.Thead(
             html.Tr([html.Th("TITLE"), html.Th("CONTENT")])
