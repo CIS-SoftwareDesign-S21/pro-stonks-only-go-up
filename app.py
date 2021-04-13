@@ -158,7 +158,7 @@ def update_scraper_box(n_clicks, ticker, platform):
     print('Updating table for scraper box')
     table = make_table(newPosts, platform)
 
-    return sentiment, table
+    return sentiment, fig, table
 
 
 # callback for save button
@@ -275,12 +275,16 @@ def sentiment_analysis_graph(posts):
 
     fig = go.Figure()
 
+    stonks = ['GME']
+
     fig = go.Figure(data=[
-        go.Bar(name='Positive', x="Sentiment", y=df),
-        go.Bar(name='Negative', x="Sentiment", y=[12, 18, 29])
+        go.Bar(name='Positive', x=stonks, y=[np.in1d(df['label'],1).sum()]),
+        go.Bar(name='Negative', x=stonks, y=[np.in1d(df['label'],-1).sum()])
     ])
 
-    return sentiment,fig
+    fig.update_layout(barmode='stack')
+
+    return sentiment, fig
 
 if __name__ == '__main__':
     app.run_server(debug=True)
