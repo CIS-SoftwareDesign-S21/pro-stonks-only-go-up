@@ -1,6 +1,15 @@
 body {
     font-family: sans-serif;
 }
-h1, h2, h3, h4, h5, h6 {
-    color: rgb(48, 56, 63)
+
+h2, h3, h4, h5, h6 {
+    color: rgb(79, 22, 145);
 }
+
+h1 {
+    color: Black;
+}
+
+/* img {
+    vertical-align: middle;
+} */
