@@ -26,10 +26,11 @@ app.server.assets_folder = 'assets'
 #                         name = 'GME'))
 
 app.layout = html.Div(children=[
+
     html.H1(children='Stonks only go Up', className="app-header--title"),
 
+    # graphs
     html.H3(children='Social Media Sentiment and Historical Prices of Stonks'),
-
     # dcc.Input(
     #     id="input_text",
     #     type="text",
@@ -48,6 +49,8 @@ app.layout = html.Div(children=[
         id='Historical',
     ),
     html.Div("Sentiment: ", id="Sentiment"),
+
+    # searching interface
     html.H2(children='Recent Relevant Post Titles (250)'),
     html.Button('Query Reddit for Selected Stock Posts',
                 id='update_titles', n_clicks=0),
@@ -64,22 +67,30 @@ app.layout = html.Div(children=[
         id='gme_titles_listbox'
     ),
     
+    # database interface
     html.H2(children='Reddit Posts stored in Database matching GME'),
-    html.Div(children=[html.Li(post[0]+'\n') for post in dbconn.get_reddit_posts("GME")],
-        style={"maxHeight": "400px", "overflow": "scroll"}
+    dcc.Dropdown(
+        id='db-dropdown',
+        options=[
+            {'label': 'Gamestop', 'value': 'gme'},
+            {'label': 'Tesla', 'value': 'tsla'}
+        ],
+        value='gme'
+    ),
+    html.Div(children='init',
+        style={"maxHeight": "400px", "overflow": "scroll"},
+        id='db-listbox'
     )
 ])
 
 
+# callback for graph radio buttons
 @app.callback(Output('Historical', 'figure'),
               [Input('Stonks', 'value')])
 def render_charts(stonk):
 
-    df = pd.read_csv(
-        r'GME.csv')
-
-    df2 = pd.read_csv(
-        r'TSLA.csv')
+    df = pd.read_csv(r'GME.csv')
+    df2 = pd.read_csv(r'TSLA.csv')
 
     # charts = [
     #     go.Scatter(labels=df['Date'], values=df2['Close'],
@@ -115,6 +126,7 @@ def render_charts(stonk):
         return fig2
 
 
+# callback for search dropdown
 @app.callback(
     dash.dependencies.Output('Sentiment', 'children'),
     dash.dependencies.Output('gme_titles_listbox', 'children'),
@@ -147,6 +159,42 @@ def update_gme_titles(n_clicks, ticker):
 
     newList = html.Ul([html.Li(x) for x in newTitles])
     print("Updating titles for ticker")
+
+    return sentiment, newList
+
+
+# callback for database dropdown
+@app.callback(
+    dash.dependencies.Output('db-listbox', 'children'),
+    [dash.dependencies.Input('db-dropdown', 'value')]
+)
+def update_db_box(ticker):
+    print("Searching for " + ticker + " in db")
+    newPosts = dbconn.get_reddit_posts('GME')
+    newTitles = [post[0] for post in dbconn.get_reddit_posts("GME")]
+
+    sia = SIA()
+    results = []
+    for title in newTitles:
+        title = title.strip('\n')
+        pol_score = sia.polarity_scores(title)
+        pol_score['headline'] = title
+        results.append(pol_score)
+    
+    df = pd.DataFrame.from_records(results)
+    df['label'] = 0
+    df.loc[df['compound'] > 0.2, 'label'] = 1
+    df.loc[df['compound'] < -0.2, 'label'] = -1
+
+    if df.label.sum() > 0:
+        sentiment = "Sentiment: Positive"
+    elif df.label.sum() < 0:
+        sentiment = "Sentiment: Negative"
+    else: 
+        sentiment = "Sentiment: Neutral"
+
+    newList = html.Ul([html.Li(x) for x in newTitles])
+    print("Updating titles for db box")
 
     return sentiment, newList
 

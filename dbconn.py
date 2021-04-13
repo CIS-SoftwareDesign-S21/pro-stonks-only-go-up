@@ -25,11 +25,11 @@ def __exec(stmt, args):
         return result
         
 
-def insert_reddit_post(ticker, title): 
+def insert_reddit_post(ticker, title, content): 
     __exec(("INSERT INTO reddit_post "
-            "(post_ticker, post_title) "
+            "(post_ticker, post_title, post_content) "
             "VALUES (%s, %s)"),
-            (ticker.upper(), title))
+            (ticker.upper(), title, content))
 
 def insert_twitter_post(ticker, content):
     __exec(("INSERT INTO twitter_post "
