@@ -1,60 +1,65 @@
-import tweepy
-import json
+from tweepy import Stream
+from tweepy import OAuthHandler
+from tweepy.streaming import StreamListener
+import mysql.connector
 import datetime
-import time
-
-time.sleep(3)
-
-#Sentiment Analyzer
-
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+from unidecode import unidecode
+import time
+import pandas as pd
+import json
 analyzer = SentimentIntensityAnalyzer()
 
+# Insert your twitter API key here 
+ckey=""
+csecret=""
+atoken=""
+asecret=""
 
-# Importing Keys
+#connect to a mysql server 
+mydb = mysql.connector.connect(
+host ="",
+user ="",
+passwd = ""
+)
 
-with open('keys.json') as keysfile:
-	keys = json.load(keysfile)
+mycursor = mydb.cursor()
 
+# Create a database for storing twitter data 
+mycursor.execute("CREATE DATABASE IF NOT EXISTS twitter_data")
 
-#adding support for sentiment analysis of multiple stoinks
+mycursor.execute("""CREATE TABLE IF NOT EXISTS twitter_data.twitter_data_sentiment
+                (date_time DATETIME,
+                author VARCHAR(500),
+                tweet VARCHAR(2000),
+                sentiment DECIMAL(5,4)
+                )
+                """)
 
-Total = {
-	"total_sentiment": 0.0,
-	"Stocks_analized": 0
-}
-
-Stocks = {
-	"$GME": {
-		"total_sentiment": 0.0,
-		"Stocks_analized": 0
-	},
-	"$TSLA": {
-		"total_sentiment": 0.0,
-		"Stocks_analized": 0
-	},
-}
-
-# Setting up Tweepy (Twitter API Wrapper for python)
-
-auth = tweepy.OAuthHandler(keys['API_Key'], keys['API_Secret_Key'])
-auth.set_access_token(keys['Access_Token'], keys['Access_Token_Secret'])
-
-api = tweepy.API(auth)
+sqlFormula = "INSERT INTO twitter_data.twitter_data_sentiment (date_time, author, tweet, sentiment) VALUES (%s, %s, %s, %s)"
 
 
-# Getting the text of a status, including retweets.
+class listener(StreamListener):
+    def on_data(self,data):
+        all_data = json.loads(data)
+        current_time = datetime.datetime.now()
+        author = str(all_data['user']['screen_name'])
+        tweet = str(all_data["text"])
+        vs = analyzer.polarity_scores(unidecode(tweet))
+        sentiment = vs['compound']
+        db = (current_time, author, tweet,sentiment)
+        mycursor.execute(sqlFormula, db)
+        mydb.commit()
+    def on_error(self,status):
+        print(status)
 
-def get_status_full_text(status):
-	if 'extended_tweet' in status.__dict__.keys():
-		return status.extended_tweet['full_text'] # extended text
-	elif 'retweeted_status' in status.__dict__.keys():
-		if "full_text" in status.retweeted_status.__dict__.keys():
-			return status.retweeted_status.full_text #retweet full text
-		else:
-			if status.retweeted_status.truncated:
-				return status.retweeted_status.extended_tweet['full_text'] # Retweet extended text full text
-			else:
-				return status.text #retweet normal text
-	else:
-		return status.text
+## Connecting to twitter and establishing a live stream 
+while True:
+    try:
+        auth = OAuthHandler(ckey, csecret)
+        auth.set_access_token(atoken, asecret)
+        twitterStream = Stream(auth, listener())
+        twitterStream.filter(track=["$"]) #this tracks any tweet with a $ symbol. Unlike Reddit, a large proportion of twitter users use $ before the stock tickers
+    except Exception as e:
+        print(str(e))
+        time.sleep(10)
