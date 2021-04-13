@@ -16,18 +16,12 @@ import dbconn
 app = dash.Dash(__name__)
 app.server.assets_folder = 'assets'
 
-app.layout = html.Div(style={"margin": "15px"},
-    children=[
+app.layout = html.Div(style={"margin": "15px"}, children=[
 
     html.H1(children='Stonks only go Up', className="app-header--title"),
 
     # graphs
     html.H3(children='Social Media Sentiment and Historical Prices of Stonks'),
-    # dcc.Input(
-    #     id="input_text",
-    #     type="text",
-    #     placeholder="input type text",
-    # ),
     dcc.RadioItems(
         id='Stonks',
         options=[
@@ -37,21 +31,19 @@ app.layout = html.Div(style={"margin": "15px"},
         value='GME',
         labelStyle={'display': 'inline-block'}
     ),
-    dcc.Graph(
-        id='Historical',
-    ),
+    dcc.Graph(id='Historical', style={"border": "5px solid #4d8eff"}),
     
     # searching interface
-    html.H2(children='Recent Relevant Reddit Posts (100)'),
+    html.H2('Recent Relevant Posts (100)'),
     html.H3("Sentiment: ", id="scraper-sentiment"),
-    html.Button('Refresh',id='scraper-refresh'),
     dcc.Dropdown(
         id='scraper-platform',
         options=[
             {'label': 'Reddit', 'value': 'reddit'},
             {'label': 'Twitter', 'value': 'twitter'}
         ],
-        value='reddit'
+        value='reddit',
+        style={"display": "inline-block", "width": "200px"}
     ),
     dcc.Dropdown(
         id='scraper-ticker',
@@ -59,26 +51,25 @@ app.layout = html.Div(style={"margin": "15px"},
             {'label': 'Gamestop', 'value': 'gme'},
             {'label': 'Tesla', 'value': 'tsla'}
         ],
-        value='gme'
+        value='gme',
+        style={"display": "inline-block", "width": "200px"}
     ),
-    html.Div(children="init",
-        style={"maxHeight": "400px", "overflow": "scroll"},
-        id='scraper-listbox'
-    ),
+    html.Button('Refresh', id='scraper-refresh'),
+    html.Div("init", id='scraper-listbox', style={"maxHeight": "400px", "overflow": "scroll"}),
     html.Button('Save', id='save-button'),
     html.Span(id='save-result'),
     
     # database interface
-    html.H2(children='Reddit Posts stored in Database matching GME'),
+    html.H2('Posts stored in Database'),
     html.H3("Sentiment: ", id="db-sentiment"),
-    html.Button('Refresh',id='db-refresh'),
     dcc.Dropdown(
         id='db-platform',
         options=[
             {'label': 'Reddit', 'value': 'reddit'},
             {'label': 'Twitter', 'value': 'twitter'}
         ],
-        value='reddit'
+        value='reddit',
+        style={"display": "inline-block", "width": "200px"}
     ),
     dcc.Dropdown(
         id='db-ticker',
@@ -86,12 +77,11 @@ app.layout = html.Div(style={"margin": "15px"},
             {'label': 'Gamestop', 'value': 'gme'},
             {'label': 'Tesla', 'value': 'tsla'}
         ],
-        value='gme'
+        value='gme',
+        style={"display": "inline-block", "width": "200px"}
     ),
-    html.Div(children='init',
-        style={"maxHeight": "400px", "overflow": "scroll"},
-        id='db-listbox'
-    )
+    html.Button('Refresh', id='db-refresh'),
+    html.Div('init', id='db-listbox', style={"maxHeight": "400px", "overflow": "scroll"})
 ])
 
 
@@ -103,20 +93,12 @@ def render_charts(stonk):
     df = pd.read_csv(r'GME.csv')
     df2 = pd.read_csv(r'TSLA.csv')
 
-    # charts = [
-    #     go.Scatter(labels=df['Date'], values=df2['Close'],
-    #                mode='lines', name='GME'),
-    #     go.Scatter(labels=df2['Date'], values=df2['Close'],
-    #                mode='lines', name='TSLA'),
-    # ]
-
     fig = go.Figure()
     fig2 = go.Figure()
 
     fig.add_trace(go.Scatter(x=df['Date'], y=df['Close'],
                              mode='lines',
                              name='GME'))
-
     fig.add_trace(go.Scatter(x=df2['Date'], y=np.random.rand(len(df['Date']))*df['Close'].max(),
                              mode='lines',
                              name='Sentiment',
@@ -125,7 +107,6 @@ def render_charts(stonk):
     fig2.add_trace(go.Scatter(x=df2['Date'], y=df2['Close'],
                               mode='lines',
                               name='TSLA'))
-
     fig2.add_trace(go.Scatter(x=df2['Date'], y=np.random.rand(len(df['Date']))*df2['Close'].max(),
                               mode='lines',
                               name='Sentiment',
@@ -182,9 +163,9 @@ def save_posts(n_clicks, table, ticker, platform):
             dbconn.insert_reddit_post(ticker, tds[0]['props']['children'], tds[1]['props']['children'])
             # TODO: IMPLEMENT TWITTER
             # if platform == 'reddit':
-            #     newPosts = dbconn.insert_reddit_post(ticker, tds[0]['props']['children'], tds[1]['props']['children'])
+            #     dbconn.insert_reddit_post(ticker, tds[0]['props']['children'], tds[1]['props']['children'])
             # elif platform == 'twitter':
-            #     newPosts = dbconn.insert_twitter_post(ticker, tds[0]['props']['children'])
+            #     dbconn.insert_twitter_post(ticker, tds[0]['props']['children'])
         print("Saving Done")
         return "Saved " + str(len(tableBody['props']['children'])) + " posts"
 
@@ -202,7 +183,6 @@ def update_db_box(n_clicks, ticker, platform):
     newPosts = dbconn.get_reddit_posts(ticker)
 
     # TODO: IMPLEMENT TWITTER
-    # newPosts = None
     # if platform == 'reddit':
     #     newPosts = dbconn.get_reddit_posts(ticker)
     # elif platform == 'twitter':
@@ -219,23 +199,13 @@ def update_db_box(n_clicks, ticker, platform):
 # helper function to create html table
 def make_table(posts, platform):
     if platform == 'reddit':
-        return html.Table([
-            html.Thead(
-                html.Tr([html.Th("TITLE"), html.Th("CONTENT")])
-            ),
-            html.Tbody([
-                html.Tr([html.Td(post[0]), html.Td(post[1])]) for post in posts
-            ])
-        ])
+        tableHead = html.Thead(html.Tr([html.Th("TITLE"), html.Th("CONTENT")]))
+        tableBody = html.Tbody([html.Tr([html.Td(post[0]), html.Td(post[1])]) for post in posts])
     elif platform == 'twitter':
-        return html.Table([
-            html.Thead(
-                html.Tr([html.Th("CONTENT")])
-            ),
-            html.Tbody([
-                html.Tr([html.Td(post[0])]) for post in posts
-            ])
-        ])
+        tableHead = html.Thead(html.Tr([html.Th("CONTENT")]))
+        tableBody = html.Tbody([html.Tr([html.Td(post[0])]) for post in posts])
+    
+    return html.Table([tableHead, tableBody])
 
 
 # helper function to perform sentiment analysis
