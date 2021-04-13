@@ -2,3 +2,31 @@ body {
     margin: 0; 
     background-color: #a7c5f8;
 }
+
+table, th, td {
+    border: 1px solid #c6d9f8;
+    border-collapse: collapse;
+    padding: 8px;
+}
+
+table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+tr:nth-child(even){background-color: #b5cefa;}
+
+tr:hover {background-color: #c6d9f8;}
+
+th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  background-color: #4d8eff;
+  color: white;
+}
+
+td {
+    white-space: nowrap;
+    overflow: hidden;
+    width: 50%;
+}
