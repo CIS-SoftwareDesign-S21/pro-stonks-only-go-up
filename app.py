@@ -136,6 +136,7 @@ def render_charts(stonk):
 # callback for scraper dropdown
 @app.callback(
     dash.dependencies.Output('scraper-sentiment', 'children'),
+    dash.dependencies.Output('Sentiment_Graph', 'figure'),
     dash.dependencies.Output('scraper-listbox', 'children'),
     [dash.dependencies.Input('scraper-refresh', 'n_clicks')],
     [dash.dependencies.Input('scraper-ticker', 'value')],
@@ -152,7 +153,7 @@ def update_scraper_box(n_clicks, ticker, platform):
     # elif platform == 'twitter':
     #     newPosts = twitter_scraper.get_posts(ticker)
 
-    sentiment = sentiment_analysis(newPosts)
+    sentiment, fig = sentiment_analysis_graph(newPosts)
 
     print('Updating table for scraper box')
     table = make_table(newPosts, platform)
@@ -238,14 +239,48 @@ def sentiment_analysis(posts):
     df.loc[df['compound'] > 0.2, 'label'] = 1
     df.loc[df['compound'] < -0.2, 'label'] = -1
 
-    if df.label.sum() > 0:
-        return "Sentiment: Positive"
-    elif df.label.sum() < 0:
-        return "Sentiment: Negative"
-    else: 
-        return "Sentiment: Neutral"
+    sentiment = ""
 
-# def sentiment_graph(sent_df):
+    if df.label.sum() > 0:
+        sentiment = "Sentiment: Positive"
+    elif df.label.sum() < 0:
+        sentiment = "Sentiment: Negative"
+    else: 
+        sentiment = "Sentiment: Neutral"
+
+    return sentiment
+
+def sentiment_analysis_graph(posts):
+    sia = SIA()
+    results = []
+    for post in posts:
+        title = post[0].strip('\n')
+        pol_score = sia.polarity_scores(title)
+        pol_score['headline'] = title
+        results.append(pol_score)
+    
+    df = pd.DataFrame.from_records(results)
+    df['label'] = 0
+    df.loc[df['compound'] > 0.2, 'label'] = 1
+    df.loc[df['compound'] < -0.2, 'label'] = -1
+
+    sentiment = ""
+
+    if df.label.sum() > 0:
+        sentiment = "Sentiment: Positive"
+    elif df.label.sum() < 0:
+        sentiment = "Sentiment: Negative"
+    else: 
+        sentiment = "Sentiment: Neutral"
+
+    fig = go.Figure()
+
+    fig = go.Figure(data=[
+        go.Bar(name='Positive', x="Sentiment", y=df),
+        go.Bar(name='Negative', x="Sentiment", y=[12, 18, 29])
+    ])
+
+    return sentiment,fig
 
 if __name__ == '__main__':
     app.run_server(debug=True)
