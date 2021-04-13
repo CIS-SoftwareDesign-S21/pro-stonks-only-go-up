@@ -25,7 +25,8 @@ app.server.assets_folder = 'assets'
 #                         mode = 'lines',
 #                         name = 'GME'))
 
-app.layout = html.Div(children=[
+app.layout = html.Div(style={"margin": "15px"},
+    children=[
 
     html.H1(children='Stonks only go Up', className="app-header--title"),
 
@@ -50,21 +51,21 @@ app.layout = html.Div(children=[
     ),
     
     # searching interface
-    html.Div("Sentiment: ", id="Sentiment"),
     html.H2(children='Recent Relevant Reddit Posts (500)'),
-    html.Button('Query Reddit for Selected Stock Posts',
-                id='update_titles', n_clicks=0),
+    html.Button('Refresh',
+                id='scraper-refresh', n_clicks=0),
     dcc.Dropdown(
-        id='ticker-dropdown',
+        id='scraper-dropdown',
         options=[
             {'label': 'Gamestop', 'value': 'gme'},
             {'label': 'Tesla', 'value': 'tsla'}
         ],
         value='gme'
     ),
+    html.Div("Sentiment: ", id="scraper-sentiment"),
     html.Div(children="init",
         style={"maxHeight": "400px", "overflow": "scroll"},
-        id='gme_titles_listbox'
+        id='scraper-listbox'
     ),
     
     # database interface
@@ -77,6 +78,7 @@ app.layout = html.Div(children=[
         ],
         value='gme'
     ),
+    html.Div("Sentiment: ", id="db-sentiment"),
     html.Div(children='init',
         style={"maxHeight": "400px", "overflow": "scroll"},
         id='db-listbox'
@@ -128,15 +130,15 @@ def render_charts(stonk):
 
 # callback for search dropdown
 @app.callback(
-    dash.dependencies.Output('Sentiment', 'children'),
-    dash.dependencies.Output('gme_titles_listbox', 'children'),
-    [dash.dependencies.Input('update_titles', 'n_clicks')],
-    [dash.dependencies.Input('ticker-dropdown', 'value')]
+    dash.dependencies.Output('scraper-sentiment', 'children'),
+    dash.dependencies.Output('scraper-listbox', 'children'),
+    [dash.dependencies.Input('scraper-refresh', 'n_clicks')],
+    [dash.dependencies.Input('scraper-dropdown', 'value')]
 )
 def update_gme_titles(n_clicks, ticker):
-    print("Searching for " + ticker)
-    newPosts = reddit_scraper.search_pushshift_titles(ticker, 500, 0)
-    #newPosts = reddit_scraper.search_reddit_titles(ticker)
+    print("Searching for " + ticker + " in scraper")
+    newPosts = reddit_scraper.search_pushshift_titles(ticker, 50, 0)
+    # newPosts = reddit_scraper.search_reddit_titles(ticker)
 
     sia = SIA()
     results = []
@@ -158,25 +160,33 @@ def update_gme_titles(n_clicks, ticker):
     else: 
         sentiment = "Sentiment: Neutral"
 
-    newList = html.Ul([html.Li("TITLE: " + x[0] + " | POST CONTENT:" + x[1]) for x in newPosts])
+    print('Updating titles for scraper box')
+    table = html.Table([
+        html.Thead(
+            html.Tr([html.Th("TITLE"), html.Th("CONTENT")])
+        ),
+        html.Tbody([
+            html.Tr([html.Td(post[0]), html.Td(post[1])]) for post in newPosts
+        ])
+    ])
 
-    return sentiment, newList
+    return sentiment, table
 
 
 # callback for database dropdown
 @app.callback(
+    dash.dependencies.Output('db-sentiment', 'children'),
     dash.dependencies.Output('db-listbox', 'children'),
     [dash.dependencies.Input('db-dropdown', 'value')]
 )
 def update_db_box(ticker):
     print("Searching for " + ticker + " in db")
     newPosts = dbconn.get_reddit_posts('GME')
-    newTitles = [post[0] for post in dbconn.get_reddit_posts("GME")]
 
     sia = SIA()
     results = []
-    for title in newTitles:
-        title = title.strip('\n')
+    for post in newPosts:
+        title = post[0].strip('\n')
         pol_score = sia.polarity_scores(title)
         pol_score['headline'] = title
         results.append(pol_score)
@@ -193,10 +203,17 @@ def update_db_box(ticker):
     else: 
         sentiment = "Sentiment: Neutral"
 
-    newList = html.Ul([html.Li(x) for x in newTitles])
     print("Updating titles for db box")
+    table = html.Table([
+        html.Thead(
+            html.Tr([html.Th("TITLE"), html.Th("CONTENT")])
+        ),
+        html.Tbody([
+            html.Tr([html.Td(post[0]), html.Td(post[1])]) for post in newPosts
+        ])
+    ])
 
-    return sentiment, newList
+    return sentiment, table
 
 
 if __name__ == '__main__':
