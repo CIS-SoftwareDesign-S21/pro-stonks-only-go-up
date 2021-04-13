@@ -50,6 +50,9 @@ app.layout = html.Div(children=[
         id='Historical',
     ),
     html.Div("Sentiment: ", id="Sentiment"),
+    dcc.Graph(
+        id='Sentiment_Graph',
+    ),
     html.H2(children='Recent Relevant Reddit Posts (500)'),
     html.Button('Query Reddit for Selected Stock Posts',
                 id='update_titles', n_clicks=0),
@@ -152,6 +155,7 @@ def update_gme_titles(n_clicks, ticker):
 
     return sentiment, newList
 
+# def sentiment_graph(sent_df):
 
 if __name__ == '__main__':
     app.run_server(debug=True)
