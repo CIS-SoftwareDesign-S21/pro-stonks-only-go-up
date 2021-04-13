@@ -24,7 +24,6 @@ app.layout = html.Div(style={"margin": "15px"}, children=[
     
     html.H3(children='Social Media Sentiment and Historical Prices of Stonks'),
 
-
     # dcc.Input(
     #     id="input_text",
     #     type="text",
@@ -53,6 +52,13 @@ app.layout = html.Div(style={"margin": "15px"}, children=[
         value='reddit',
         style={"display": "inline-block", "width": "200px"}
     ),
+    html.Div("Sentiment: ", id="Sentiment"),
+    dcc.Graph(
+        id='Sentiment_Graph',
+    ),
+    html.H2(children='Recent Relevant Reddit Posts (500)'),
+    html.Button('Query Reddit for Selected Stock Posts',
+                id='update_titles', n_clicks=0),
     dcc.Dropdown(
         id='scraper-ticker',
         options=[
@@ -129,6 +135,7 @@ def render_charts(stonk):
 # callback for scraper dropdown
 @app.callback(
     dash.dependencies.Output('scraper-sentiment', 'children'),
+    dash.dependencies.Output('Sentiment_Graph', 'figure'),
     dash.dependencies.Output('scraper-listbox', 'children'),
     [dash.dependencies.Input('scraper-refresh', 'n_clicks')],
     [dash.dependencies.Input('scraper-ticker', 'value')],
@@ -145,12 +152,12 @@ def update_scraper_box(n_clicks, ticker, platform):
     # elif platform == 'twitter':
     #     newPosts = twitter_scraper.get_posts(ticker)
 
-    sentiment = sentiment_analysis(newPosts)
+    sentiment, fig = sentiment_analysis_graph(newPosts)
 
     print('Updating table for scraper box')
     table = make_table(newPosts, platform)
 
-    return sentiment, table
+    return sentiment, fig, table
 
 
 # callback for save button
@@ -231,13 +238,52 @@ def sentiment_analysis(posts):
     df.loc[df['compound'] > 0.2, 'label'] = 1
     df.loc[df['compound'] < -0.2, 'label'] = -1
 
-    if df.label.sum() > 0:
-        return "Sentiment: Positive"
-    elif df.label.sum() < 0:
-        return "Sentiment: Negative"
-    else: 
-        return "Sentiment: Neutral"
+    sentiment = ""
 
+    if df.label.sum() > 0:
+        sentiment = "Sentiment: Positive"
+    elif df.label.sum() < 0:
+        sentiment = "Sentiment: Negative"
+    else: 
+        sentiment = "Sentiment: Neutral"
+
+    return sentiment
+
+def sentiment_analysis_graph(posts):
+    sia = SIA()
+    results = []
+    for post in posts:
+        title = post[0].strip('\n')
+        pol_score = sia.polarity_scores(title)
+        pol_score['headline'] = title
+        results.append(pol_score)
+    
+    df = pd.DataFrame.from_records(results)
+    df['label'] = 0
+    df.loc[df['compound'] > 0.2, 'label'] = 1
+    df.loc[df['compound'] < -0.2, 'label'] = -1
+
+    sentiment = ""
+
+    if df.label.sum() > 0:
+        sentiment = "Sentiment: Positive"
+    elif df.label.sum() < 0:
+        sentiment = "Sentiment: Negative"
+    else: 
+        sentiment = "Sentiment: Neutral"
+
+    fig = go.Figure()
+
+    stonks = ['GME']
+
+    fig = go.Figure(data=[
+        go.Bar(name='Positive', x=stonks, y=[np.in1d(df['label'],1).sum()]),
+        go.Bar(name='Negative', x=stonks, y=[np.in1d(df['label'],-1).sum()])
+    ])
+
+    fig.update_layout(barmode='stack')
+
+    return sentiment, fig
 
 if __name__ == '__main__':
     app.run_server(debug=True)
