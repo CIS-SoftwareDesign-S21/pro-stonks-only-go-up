@@ -281,7 +281,9 @@ def sentiment_analysis_graph(posts):
         go.Bar(name='Negative', x=stonks, y=[np.in1d(df['label'],-1).sum()])
     ])
 
-    fig.update_layout(barmode='stack')
+    fig.update_layout(barmode='stack',
+                    width=400,
+                    height=600)
 
     return sentiment, fig
 
