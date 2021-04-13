@@ -16,15 +16,6 @@ import dbconn
 app = dash.Dash(__name__)
 app.server.assets_folder = 'assets'
 
-# df = pd.read_csv(
-#     r'GME.csv')
-
-# fig = go.Figure()
-
-# fig.add_trace(go.Scatter(x=df['Date'],y=df['Close'],
-#                         mode = 'lines',
-#                         name = 'GME'))
-
 app.layout = html.Div(style={"margin": "15px"},
     children=[
 
@@ -55,7 +46,15 @@ app.layout = html.Div(style={"margin": "15px"},
     html.H3("Sentiment: ", id="scraper-sentiment"),
     html.Button('Refresh',id='scraper-refresh'),
     dcc.Dropdown(
-        id='scraper-dropdown',
+        id='scraper-platform',
+        options=[
+            {'label': 'Reddit', 'value': 'reddit'},
+            {'label': 'Twitter', 'value': 'twitter'}
+        ],
+        value='reddit'
+    ),
+    dcc.Dropdown(
+        id='scraper-ticker',
         options=[
             {'label': 'Gamestop', 'value': 'gme'},
             {'label': 'Tesla', 'value': 'tsla'}
@@ -74,7 +73,15 @@ app.layout = html.Div(style={"margin": "15px"},
     html.H3("Sentiment: ", id="db-sentiment"),
     html.Button('Refresh',id='db-refresh'),
     dcc.Dropdown(
-        id='db-dropdown',
+        id='db-platform',
+        options=[
+            {'label': 'Reddit', 'value': 'reddit'},
+            {'label': 'Twitter', 'value': 'twitter'}
+        ],
+        value='reddit'
+    ),
+    dcc.Dropdown(
+        id='db-ticker',
         options=[
             {'label': 'Gamestop', 'value': 'gme'},
             {'label': 'Tesla', 'value': 'tsla'}
@@ -135,44 +142,24 @@ def render_charts(stonk):
     dash.dependencies.Output('scraper-sentiment', 'children'),
     dash.dependencies.Output('scraper-listbox', 'children'),
     [dash.dependencies.Input('scraper-refresh', 'n_clicks')],
-    [dash.dependencies.Input('scraper-dropdown', 'value')]
+    [dash.dependencies.Input('scraper-ticker', 'value')],
+    [dash.dependencies.Input('scraper-platform', 'value')]
 )
-def update_scraper_box(n_clicks, ticker):
-    print("Searching for " + ticker + " in scraper")
+def update_scraper_box(n_clicks, ticker, platform):
+    print("Searching for " + ticker + " from " + platform + " in scraper")
     newPosts = reddit_scraper.search_pushshift_titles(ticker, 100, 0)
-    scrapedPosts = newPosts
-    scrapedTicker = ticker
     # newPosts = reddit_scraper.search_reddit_titles(ticker)
 
-    sia = SIA()
-    results = []
-    for post in newPosts:
-        title = post[0].strip('\n')
-        pol_score = sia.polarity_scores(title)
-        pol_score['headline'] = title
-        results.append(pol_score)
-    
-    df = pd.DataFrame.from_records(results)
-    df['label'] = 0
-    df.loc[df['compound'] > 0.2, 'label'] = 1
-    df.loc[df['compound'] < -0.2, 'label'] = -1
+    # TODO: IMPLEMENT TWITTER
+    # if platform == 'reddit':
+    #     newPosts = reddit_scraper.search_pushshift_titles(ticker, 100, 0)
+    # elif platform == 'twitter':
+    #     newPosts = twitter_scraper.get_posts(ticker)
 
-    if df.label.sum() > 0:
-        sentiment = "Sentiment: Positive"
-    elif df.label.sum() < 0:
-        sentiment = "Sentiment: Negative"
-    else: 
-        sentiment = "Sentiment: Neutral"
+    sentiment = sentiment_analysis(newPosts)
 
     print('Updating table for scraper box')
-    table = html.Table([
-        html.Thead(
-            html.Tr([html.Th("TITLE"), html.Th("CONTENT")])
-        ),
-        html.Tbody([
-            html.Tr([html.Td(post[0]), html.Td(post[1])]) for post in newPosts
-        ])
-    ])
+    table = make_table(newPosts, platform)
 
     return sentiment, table
 
@@ -182,17 +169,22 @@ def update_scraper_box(n_clicks, ticker):
     dash.dependencies.Output('save-result', 'children'),
     [dash.dependencies.Input('save-button', 'n_clicks')],
     [dash.dependencies.Input('scraper-listbox', 'children')],
-    [dash.dependencies.Input('scraper-dropdown', 'value')]
+    [dash.dependencies.Input('scraper-ticker', 'value')],
+    [dash.dependencies.Input('scraper-platform', 'value')]
 )
-def save_posts(n_clicks, table, ticker):
+def save_posts(n_clicks, table, ticker, platform):
     ctx = dash.callback_context
     if ctx.triggered[0]['prop_id'].split('.')[0] == 'save-button':
-        # print(table['props']['children'])
         print("Saving Posts")
         tableBody = table['props']['children'][1]
         for tableRow in tableBody['props']['children']:
             tds = tableRow['props']['children']
             dbconn.insert_reddit_post(ticker, tds[0]['props']['children'], tds[1]['props']['children'])
+            # TODO: IMPLEMENT TWITTER
+            # if platform == 'reddit':
+            #     newPosts = dbconn.insert_reddit_post(ticker, tds[0]['props']['children'], tds[1]['props']['children'])
+            # elif platform == 'twitter':
+            #     newPosts = dbconn.insert_twitter_post(ticker, tds[0]['props']['children'])
         print("Saving Done")
         return "Saved " + str(len(tableBody['props']['children'])) + " posts"
 
@@ -201,16 +193,56 @@ def save_posts(n_clicks, table, ticker):
 @app.callback(
     dash.dependencies.Output('db-sentiment', 'children'),
     dash.dependencies.Output('db-listbox', 'children'),
-    [dash.dependencies.Input('scraper-refresh', 'n_clicks')],
-    [dash.dependencies.Input('db-dropdown', 'value')]
+    [dash.dependencies.Input('db-refresh', 'n_clicks')],
+    [dash.dependencies.Input('db-ticker', 'value')],
+    [dash.dependencies.Input('db-platform', 'value')]
 )
-def update_db_box(n_clicks, ticker):
-    print("Searching for " + ticker + " in db")
+def update_db_box(n_clicks, ticker, platform):
+    print("Searching for " + ticker + " from " + platform + " in db")
     newPosts = dbconn.get_reddit_posts(ticker)
 
+    # TODO: IMPLEMENT TWITTER
+    # newPosts = None
+    # if platform == 'reddit':
+    #     newPosts = dbconn.get_reddit_posts(ticker)
+    # elif platform == 'twitter':
+    #     newPosts = dbconn.get_twitter_posts(ticker)
+
+    sentiment = sentiment_analysis(newPosts)
+
+    print("Updating table for db box")
+    table = make_table(newPosts, platform)
+
+    return sentiment, table
+
+
+# helper function to create html table
+def make_table(posts, platform):
+    if platform == 'reddit':
+        return html.Table([
+            html.Thead(
+                html.Tr([html.Th("TITLE"), html.Th("CONTENT")])
+            ),
+            html.Tbody([
+                html.Tr([html.Td(post[0]), html.Td(post[1])]) for post in posts
+            ])
+        ])
+    elif platform == 'twitter':
+        return html.Table([
+            html.Thead(
+                html.Tr([html.Th("CONTENT")])
+            ),
+            html.Tbody([
+                html.Tr([html.Td(post[0])]) for post in posts
+            ])
+        ])
+
+
+# helper function to perform sentiment analysis
+def sentiment_analysis(posts):
     sia = SIA()
     results = []
-    for post in newPosts:
+    for post in posts:
         title = post[0].strip('\n')
         pol_score = sia.polarity_scores(title)
         pol_score['headline'] = title
@@ -222,23 +254,11 @@ def update_db_box(n_clicks, ticker):
     df.loc[df['compound'] < -0.2, 'label'] = -1
 
     if df.label.sum() > 0:
-        sentiment = "Sentiment: Positive"
+        return "Sentiment: Positive"
     elif df.label.sum() < 0:
-        sentiment = "Sentiment: Negative"
+        return "Sentiment: Negative"
     else: 
-        sentiment = "Sentiment: Neutral"
-
-    print("Updating table for db box")
-    table = html.Table([
-        html.Thead(
-            html.Tr([html.Th("TITLE"), html.Th("CONTENT")])
-        ),
-        html.Tbody([
-            html.Tr([html.Td(post[0]), html.Td(post[1])]) for post in newPosts
-        ])
-    ])
-
-    return sentiment, table
+        return "Sentiment: Neutral"
 
 
 if __name__ == '__main__':
