@@ -16,6 +16,8 @@ import dbconn
 app = dash.Dash(__name__, title = 'Stonks Only Go Up 📈', update_title = 'Collecting Data...')
 app.server.assets_folder = 'assets'
 
+server = app.server
+
 app.layout = html.Div(style={"margin": "15px"}, children=[
 
     html.H1(children='Stonks only go Up', className="app-header--title"),
