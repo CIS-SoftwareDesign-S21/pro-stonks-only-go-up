@@ -12,7 +12,9 @@ def search_reddit_titles(ticker):
     relevantData = []
 
     for submission in reddit.subreddit("all").search("title:"+ticker, "new", limit=250):
-        relevantData.append([submission.title, submission.selftext, submission.created_utc])
+        if hasContent(submission, "reddit"):
+            selftext = re.sub(r"\[(.*?)\)|http\S+", "", submission.selftext)
+            relevantData.append([submission.title, selftext, submission.created_utc])
     
     return relevantData
 
@@ -31,9 +33,9 @@ def search_pushshift_titles(ticker, size, timePage):
         r = requests.get(search_url + str(timePage))
 
         data = json.loads(r.text)
-
+        
         for submission in data["data"]:
-            if hasContent(submission) and i < size:
+            if hasContent(submission, "pushshift") and i < size:
                 selftext = re.sub(r"\[(.*?)\)|http\S+", "", str(submission["selftext"]))
                 relevantData.append([str(submission["title"]), selftext, submission["created_utc"]])
                 i += 1
@@ -48,12 +50,19 @@ def search_pushshift_titles(ticker, size, timePage):
 
     return relevantData
 
-def hasContent(submission):
-    if "selftext" in submission:    #   Some posts don't even have a selftext field, so check first
-        selftext = submission["selftext"]
-        selftext = selftext.replace("[removed]", "")
-        selftext = selftext.replace("[deleted]", "")
-        selftext = re.sub(r"\[(.*?)\)|http\S+", "", selftext)
-        return len(selftext) > 0
-
-    return False
+def hasContent(submission, api):
+    if api == "pushshift":
+        if "selftext" not in submission:
+            return False
+        else:
+            selftext = submission["selftext"]
+    elif api == "reddit":
+        if not submission.is_self:
+            return False
+        else:
+            selftext = submission.selftext
+    
+    selftext = selftext.replace("[removed]", "")
+    selftext = selftext.replace("[deleted]", "")
+    selftext = re.sub(r"\[(.*?)\)|http\S+| |[\r\n]+", "", selftext)
+    return len(selftext) > 0

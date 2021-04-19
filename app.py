@@ -71,7 +71,7 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
     dcc.Graph(
         id='Sentiment_Graph',
     ),
-    html.H2(children='Recent Relevant Reddit Posts (500)'),
+    html.H2(children='Recent Relevant Reddit Posts (200)'),
     html.Button('Query Reddit for Selected Stock Posts',
                 id='update_titles', n_clicks=0),
     dcc.Dropdown(
@@ -167,8 +167,8 @@ def render_charts(stonk):
 )
 def update_scraper_box(n_clicks, ticker, platform):
     print("Searching for " + ticker + " from " + platform + " in scraper")
-    newPosts = reddit_scraper.search_pushshift_titles(ticker, 500, 0)
-    # newPosts = reddit_scraper.search_reddit_titles(ticker)
+    newPosts = reddit_scraper.search_pushshift_titles(ticker, 200, 0)
+    #newPosts = reddit_scraper.search_reddit_titles(ticker)
 
     # TODO: IMPLEMENT TWITTER
     # if platform == 'reddit':
