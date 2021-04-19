@@ -65,7 +65,7 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
             {'label': 'Twitter', 'value': 'twitter'}
         ],
         value='reddit',
-        style={"display": "inline-block", "width": "200px"}
+        style={"display": "inline-block", "width": "200px", "color": "black"}
     ),
     html.Div("Sentiment: ", id="Sentiment"),
     dcc.Graph(
@@ -81,7 +81,7 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
             {'label': 'Tesla', 'value': 'tsla'}
         ],
         value='gme',
-        style={"display": "inline-block", "width": "200px"}
+        style={"display": "inline-block", "width": "200px", "color": "black"}
     ),
     html.Button('Refresh', id='scraper-refresh'),
     html.Div("init", id='scraper-listbox', style={"maxHeight": "400px", "overflow": "scroll"}),
@@ -98,7 +98,7 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
             {'label': 'Twitter', 'value': 'twitter'}
         ],
         value='reddit',
-        style={"display": "inline-block", "width": "200px"}
+        style={"display": "inline-block", "width": "200px", "color": "black"}
     ),
     dcc.Dropdown(
         id='db-ticker',
@@ -107,7 +107,7 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
             {'label': 'Tesla', 'value': 'tsla'}
         ],
         value='gme',
-        style={"display": "inline-block", "width": "200px"}
+        style={"display": "inline-block", "width": "200px", "color": "black"}
     ),
     html.Button('Refresh', id='db-refresh'),
     html.Div('init', id='db-listbox', style={"maxHeight": "400px", "overflow": "scroll"}),
@@ -115,7 +115,7 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
     
     html.Div(children=[
         html.Footer([
-            html.H3('Footer'),
+            html.Img(src="/assets/stonksgif.gif"),
             html.H5("Created By: Ayman El-sayed 🌑 Steven Zhou 🌑 Aidan Buehler 🌑 Karl Schaller 🌑 Ji Park"),
             html.H5("Stonks Only Go Up ©️ 2021"),
         ])
