@@ -12,18 +12,31 @@ import reddit_scraper
 import dbconn
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+external_stylesheets = [
+    {
+        'href':"https://kit.fontawesome.com/d313d59031.js",
+        'rel': 'stylsheet',
+        'integrity': 'sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf',
+        'crossorigin': 'anonymous'
+    }
+]
 
-app = dash.Dash(__name__, title = 'Stonks Only Go Up 📈', update_title = 'Collecting Data...')
+app = dash.Dash(__name__, title = 'Stonks Only Go Up 📈', update_title = 'Collecting Data...', external_stylesheets=external_stylesheets)
 app.server.assets_folder = 'assets'
 
 server = app.server
 
-app.layout = html.Div(style={"margin": "15px"}, children=[
-
-    html.H1(children='Stonks only go Up', className="app-header--title"),
+app.layout = html.Div(style={"margin": "0px"}, children=[
     
-    html.Img(src=app.get_asset_url('stonks.jpg'), style = {'padding-left': '90%', 'height': '10%', 'width': '10%', 'display': 'inline-block'}),
+    html.Div([
+        #html.H1("Stonks Only Go Up"),
+        # html.Img(src="/assets/stonksgif.gif")
+    ], className="banner"),
     
+    #html.H1(children='Stonks only go Up', className="app-header--title"),
+    
+    #html.Img(src=app.get_asset_url('stonks.jpg'), style = {'padding-left': '90%', 'height': '10%', 'width': '10%', 'display': 'inline-block'}),
+    html.H1('Stonks Only Go Up'),
     html.H3(children='Social Media Sentiment and Historical Prices of Stonks'),
 
     # dcc.Input(
@@ -38,7 +51,7 @@ app.layout = html.Div(style={"margin": "15px"}, children=[
             {'label': 'Tesla', 'value': 'TSLA'},
         ],
         value='GME',
-        labelStyle={'display': 'inline-block'}
+        labelStyle={'display': 'inline-block', 'color': 'white'}
     ),
     dcc.Graph(id='Historical', style={"border": "5px solid #4d8eff"}),
     
@@ -137,6 +150,15 @@ app.layout = html.Div(style={"margin": "15px"}, children=[
     dcc.Graph(
         id='db-graph',
     ),
+
+    # footer
+    html.Div(children=[
+        html.Footer([
+            html.H3('Footer'),
+            html.H5("Created By: Ayman El-sayed 🌑 Steven Zhou 🌑 Aidan Buehler 🌑 Karl Schaller 🌑 Ji Park"),
+            html.H5("Stonks Only Go Up ©️ 2021"),
+        ])
+    ], className="footer"),
 ])
 
 
@@ -330,6 +352,35 @@ def sentiment_analysis_graph(posts):
                     height=600)
 
     return sentiment, fig
+
+# def create_footer():
+#     footer_style= {"background-color": "green", "padding": "0.5rem"}
+#     p0 = html.P(
+#         children = [
+#             html.Span("Built with "),
+#             html.A(
+#                 "Plotly Dash", href="https://github.com/plotly/dash", target="_blank"
+#             ),
+#         ]
+#     )
+#     p1 = html.P(
+#         children = [
+#             html.Span("Data From "),
+#             html.A("Reddit & Twitter"),
+#         ]
+#     )
+#     a_fa = html.A(
+#         children=[
+#             html.I([], classname = "fa fa-font-awesome fa-2x"), html.Span("Font Awesome")
+#         ],
+#         style = {"text-decoration": "none"},
+#         href="http://fontawesome.io/",
+#         target="_blank",
+#     )
+    
+#     div = html.Div([p0, p1, a_fa])
+#     footer = html.Footer(children = div, style=footer_style)
+#     return footer
 
 if __name__ == '__main__':
     app.run_server(debug=True)
