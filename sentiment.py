@@ -1,0 +1,33 @@
+import dbconn
+import reddit_scraper
+import pandas as pd
+import spacy
+
+df = pd.DataFrame(reddit_scraper.search_pushshift_titles('GME',100,0),columns = ['Title','Context','Timestamp'])
+df2 = pd.DataFrame(reddit_scraper.search_pushshift_titles('TSLA',100,0),columns = ['Title','Context','Timestamp'])
+df3 = pd.DataFrame(reddit_scraper.search_pushshift_titles('AMC',100,0),columns = ['Title','Context','Timestamp'])
+df4 = pd.DataFrame(reddit_scraper.search_pushshift_titles('CLOV',100,0),columns = ['Title','Context','Timestamp'])
+df5 = pd.DataFrame(reddit_scraper.search_pushshift_titles('PLTR',100,0),columns = ['Title','Context','Timestamp'])
+df6 = pd.DataFrame(reddit_scraper.search_pushshift_titles('AAPL',100,0),columns = ['Title','Context','Timestamp'])
+df7 = pd.DataFrame(reddit_scraper.search_pushshift_titles('BB',100,0),columns = ['Title','Context','Timestamp'])
+df8 = pd.DataFrame(reddit_scraper.search_pushshift_titles('AMD',100,0),columns = ['Title','Context','Timestamp'])
+df9 = pd.DataFrame(reddit_scraper.search_pushshift_titles('SNDL',100,0),columns = ['Title','Context','Timestamp'])
+df10 = pd.DataFrame(reddit_scraper.search_pushshift_titles('PTON',100,0),columns = ['Title','Context','Timestamp'])
+
+df.insert(0,'Ticker','GME')
+df2.insert(0,'Ticker','TSLA')
+df3.insert(0,'Ticker','AMC')
+df4.insert(0,'Ticker','CLOV')
+df5.insert(0,'Ticker','PLTR')
+df6.insert(0,'Ticker','AAPL')
+df7.insert(0,'Ticker','BB')
+df8.insert(0,'Ticker','AMD')
+df9.insert(0,'Ticker','SNDL')
+df10.insert(0,'Ticker','PTON')
+
+df_total = pd.concat([df,df2,df3,df4,df5,df6,df7,df8,df9,df10],ignore_index=True)
+
+df_total = df_total.replace('[^a-zA-Z ]', ' ', regex=True)
+
+nlp = spacy.load("en_core_web_sm")
+
