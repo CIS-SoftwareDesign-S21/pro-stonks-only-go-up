@@ -43,8 +43,7 @@ app.layout = html.Div(style={"margin": "15px"}, children=[
     dcc.Graph(id='Historical', style={"border": "5px solid #4d8eff"}),
     
     # searching interface
-    html.H2('Recent Relevant Posts (100)'),
-    html.H3("Sentiment: ", id="scraper-sentiment"),
+    html.H2('Recent Relevant Posts'),
     dcc.Dropdown(
         id='scraper-platform',
         options=[
@@ -54,13 +53,6 @@ app.layout = html.Div(style={"margin": "15px"}, children=[
         value='reddit',
         style={"display": "inline-block", "width": "200px"}
     ),
-    html.Div("Sentiment: ", id="Sentiment"),
-    dcc.Graph(
-        id='Sentiment_Graph',
-    ),
-    html.H2(children='Recent Relevant Reddit Posts (500)'),
-    html.Button('Query Reddit for Selected Stock Posts',
-                id='update_titles', n_clicks=0),
     dcc.Dropdown(
         id='scraper-ticker',
         options=[
@@ -70,14 +62,43 @@ app.layout = html.Div(style={"margin": "15px"}, children=[
         value='gme',
         style={"display": "inline-block", "width": "200px"}
     ),
-    html.Button('Refresh', id='scraper-refresh'),
-    html.Div("init", id='scraper-listbox', style={"maxHeight": "400px", "overflow": "scroll"}),
+    dcc.Dropdown(
+        id='scraper-time',
+        options=[
+            {'label': '6 months', 'value': '186'},
+            {'label': '3 months', 'value': '93'},
+            {'label': '1 month', 'value': '31'},
+            {'label': '2 weeks', 'value': '14'},
+            {'label': '1 week', 'value': '7'}
+        ],
+        value='31',
+        style={"display": "inline-block", "width": "200px"}
+    ),
+    dcc.Dropdown(
+        id='scraper-quantity',
+        options=[
+            {'label': '50 posts', 'value': '50'},
+            {'label': '100 posts', 'value': '100'},
+            {'label': '500 posts', 'value': '500'}
+        ],
+        value='50',
+        style={"display": "inline-block", "width": "200px"}
+    ),
+    html.Button('Query Social Media', id='scraper-go'),
+    html.Div("Fetching posts...", id='scraper-listbox', style={"maxHeight": "400px", "overflow": "scroll"}),
+    
+    # save scraped data
     html.Button('Save', id='save-button'),
     html.Span(id='save-result'),
+
+    # graph scraped sentiment
+    html.H3("Sentiment: ", id="scraper-sentiment"),
+    dcc.Graph(
+        id='scraper-graph',
+    ),
     
     # database interface
     html.H2('Posts stored in Database'),
-    html.H3("Sentiment: ", id="db-sentiment"),
     dcc.Dropdown(
         id='db-platform',
         options=[
@@ -96,8 +117,26 @@ app.layout = html.Div(style={"margin": "15px"}, children=[
         value='gme',
         style={"display": "inline-block", "width": "200px"}
     ),
-    html.Button('Refresh', id='db-refresh'),
-    html.Div('init', id='db-listbox', style={"maxHeight": "400px", "overflow": "scroll"})
+    dcc.Dropdown(
+        id='db-time',
+        options=[
+            {'label': '6 months', 'value': '186'},
+            {'label': '3 months', 'value': '93'},
+            {'label': '1 month', 'value': '31'},
+            {'label': '2 weeks', 'value': '14'},
+            {'label': '1 week', 'value': '7'}
+        ],
+        value='31',
+        style={"display": "inline-block", "width": "200px"}
+    ),
+    html.Button('Query Database', id='db-go'),
+    html.Div('Fetching posts...', id='db-listbox', style={"maxHeight": "400px", "overflow": "scroll"}),
+    
+    # graph stored sentiment
+    html.H3("Sentiment: ", id="db-sentiment"),
+    dcc.Graph(
+        id='db-graph',
+    ),
 ])
 
 
@@ -137,15 +176,17 @@ def render_charts(stonk):
 # callback for scraper dropdown
 @app.callback(
     dash.dependencies.Output('scraper-sentiment', 'children'),
-    dash.dependencies.Output('Sentiment_Graph', 'figure'),
+    dash.dependencies.Output('scraper-graph', 'figure'),
     dash.dependencies.Output('scraper-listbox', 'children'),
-    [dash.dependencies.Input('scraper-refresh', 'n_clicks')],
+    [dash.dependencies.Input('scraper-go', 'n_clicks')],
+    [dash.dependencies.Input('scraper-platform', 'value')],
     [dash.dependencies.Input('scraper-ticker', 'value')],
-    [dash.dependencies.Input('scraper-platform', 'value')]
+    [dash.dependencies.Input('scraper-time', 'value')], # TODO: QUERY API FOR POSTS IN TIMEFRAME
+    [dash.dependencies.Input('scraper-quantity', 'value')]
 )
-def update_scraper_box(n_clicks, ticker, platform):
-    print("Searching for " + ticker + " from " + platform + " in scraper")
-    newPosts = reddit_scraper.search_pushshift_titles(ticker, 100, 0)
+def update_scraper_box(n_clicks, platform, ticker, n_days, n_posts):
+    print("Searching for " + ticker + " from " + platform + " in scraper...")
+    newPosts = reddit_scraper.search_pushshift_titles(ticker, int(n_posts), 0)
     # newPosts = reddit_scraper.search_reddit_titles(ticker)
 
     # TODO: IMPLEMENT TWITTER
@@ -191,12 +232,13 @@ def save_posts(n_clicks, table, ticker, platform):
 @app.callback(
     dash.dependencies.Output('db-sentiment', 'children'),
     dash.dependencies.Output('db-listbox', 'children'),
-    [dash.dependencies.Input('db-refresh', 'n_clicks')],
+    [dash.dependencies.Input('db-go', 'n_clicks')],
+    [dash.dependencies.Input('db-platform', 'value')],
     [dash.dependencies.Input('db-ticker', 'value')],
-    [dash.dependencies.Input('db-platform', 'value')]
+    [dash.dependencies.Input('db-time', 'value')] # TODO: QUERY DATABASE FOR POSTS IN TIME FRAME
 )
-def update_db_box(n_clicks, ticker, platform):
-    print("Searching for " + ticker + " from " + platform + " in db")
+def update_db_box(n_clicks, platform, ticker, n_days):
+    print("Searching for " + ticker + " from " + platform + " in db...")
     newPosts = dbconn.get_reddit_posts(ticker)
 
     # TODO: IMPLEMENT TWITTER
@@ -214,13 +256,13 @@ def update_db_box(n_clicks, ticker, platform):
 
 
 # helper function to create html table
-def make_table(posts, platform):
+def make_table(posts, platform): # TODO: UPDATE TABLE WITH DATE AND SENTIMENT
     if platform == 'reddit':
-        tableHead = html.Thead(html.Tr([html.Th("TITLE"), html.Th("CONTENT")]))
-        tableBody = html.Tbody([html.Tr([html.Td(post[0]), html.Td(post[1])]) for post in posts])
+        tableHead = html.Thead(html.Tr([html.Th("DATE"), html.Th("TITLE"), html.Th("CONTENT"), html.Th("SENTIMENT")]))
+        tableBody = html.Tbody([html.Tr([html.Td("0000-00-00"), html.Td(post[0]), html.Td(post[1]), html.Td("0.0000")]) for post in posts])
     elif platform == 'twitter':
-        tableHead = html.Thead(html.Tr([html.Th("CONTENT")]))
-        tableBody = html.Tbody([html.Tr([html.Td(post[0])]) for post in posts])
+        tableHead = html.Thead(html.Tr([html.Th("DATE"), html.Th("CONTENT"), html.Th("SENTIMENT")]))
+        tableBody = html.Tbody([html.Tr([html.Td("0000-00-00"), html.Td(post[0]), html.Td("0.0000")]) for post in posts])
     
     return html.Table([tableHead, tableBody])
 
