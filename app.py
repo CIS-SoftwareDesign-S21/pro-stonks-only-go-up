@@ -167,7 +167,7 @@ def render_charts(stonk):
 )
 def update_scraper_box(n_clicks, ticker, platform):
     print("Searching for " + ticker + " from " + platform + " in scraper")
-    newPosts = reddit_scraper.search_pushshift_titles(ticker, 100, 0)
+    newPosts = reddit_scraper.search_pushshift_titles(ticker, 500, 0)
     # newPosts = reddit_scraper.search_reddit_titles(ticker)
 
     # TODO: IMPLEMENT TWITTER

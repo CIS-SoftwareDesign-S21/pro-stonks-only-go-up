@@ -2,6 +2,7 @@ import praw
 import requests
 import json
 import time
+import re
 
 reddit = praw.Reddit("stonks")
 
@@ -23,7 +24,7 @@ def search_pushshift_titles(ticker, size, timePage):
     if timePage == 0:
         timePage = round(time.time())
 
-    search_url = 'https://api.pushshift.io/reddit/search/submission/?title='+str(ticker)+'&size=100&before='
+    search_url = 'https://api.pushshift.io/reddit/search/submission/?title='+str(ticker)+'&size=100&author=![deleted]&is_self=true&before='
     i = 0
 
     while i < size:
@@ -32,17 +33,27 @@ def search_pushshift_titles(ticker, size, timePage):
         data = json.loads(r.text)
 
         for submission in data["data"]:
-            if "selftext" in submission:    #   Some posts don't even have a selftext field, so check first
-                selftext = str(submission["selftext"])
-            else:
-                selftext = ""
+            if hasContent(submission) and i < size:
+                selftext = re.sub(r"\[(.*?)\)|http\S+", "", str(submission["selftext"]))
+                relevantData.append([str(submission["title"]), selftext, submission["created_utc"]])
+                i += 1
 
-            relevantData.append([str(submission["title"]), selftext, submission["created_utc"]])
-            i += 1
-        
-        if i % 100 > 0: #   If we run out of posts, don't keep searching forever!
+        if len(data["data"]) % 100 > 0: #   If API returns < 100 posts, we reached the end so stop searching
+            print("Out of posts!")
             break
 
         timePage = round(data["data"][-1]["created_utc"])
 
+    print(str(len(relevantData)))
+
     return relevantData
+
+def hasContent(submission):
+    if "selftext" in submission:    #   Some posts don't even have a selftext field, so check first
+        selftext = submission["selftext"]
+        selftext = selftext.replace("[removed]", "")
+        selftext = selftext.replace("[deleted]", "")
+        selftext = re.sub(r"\[(.*?)\)|http\S+", "", selftext)
+        return len(selftext) > 0
+
+    return False
