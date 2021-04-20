@@ -20,7 +20,7 @@ def __exec(stmt, args):
         except mysql.connector.Error as err:
             print(err)
         try:
-            result = cursor.fetchall() # might cause problems if fetching a lot of data?
+            result = cursor.fetchall()
             cursor.close()
             cnx.close()
             return result
@@ -31,24 +31,30 @@ def __exec(stmt, args):
             cnx.close()
         
 
-def insert_reddit_post(ticker, title, content): 
+def insert_reddit_post(ticker, title, content, date, sentiment): 
     __exec(("INSERT INTO reddit_post "
-            "(post_ticker, post_title, post_content) "
-            "VALUES (%s, %s, %s)"),
-            (ticker.upper(), title, content))
+            "(post_ticker, post_title, post_content, post_date, post_sentiment) "
+            "VALUES (%s, %s, %s, %s, %s) "
+            "ON DUPLICATE KEY UPDATE post_sentiment = %s"),
+            (ticker.upper(), title, content, date, sentiment, sentiment))
 
-def insert_twitter_post(ticker, content):
+def insert_twitter_post(ticker, content, date, sentiment):
     __exec(("INSERT INTO twitter_post "
-            "(post_ticker, post_content) "
-            "VALUES (%s, %s)"),
-            (ticker.upper(), content))
+            "(post_ticker, post_content, post_date, post_sentiment) "
+            "VALUES (%s, %s, %s, %s) "
+            "ON DUPLICATE KEY UPDATE post_sentiment = %s"),
+            (ticker.upper(), content, date, sentiment, sentiment))
 
-def get_reddit_posts(ticker):
-    return __exec(("SELECT post_title, post_content FROM reddit_post "
-                    "WHERE post_ticker = %s"),
-                    (ticker.upper(), ))
+def get_reddit_posts(ticker, end_date=None):
+    if not end_date:
+        end_date = '0000-00-00'
+    return __exec(("SELECT post_title, post_content, post_date, post_sentiment FROM reddit_post "
+                    "WHERE post_ticker = %s and post_date >= %s ORDER BY post_date DESC"),
+                    (ticker.upper(), end_date))
 
-def get_twitter_posts(ticker):
-    return __exec(("SELECT post_content FROM twitter_post "
-                    "WHERE post_ticker = %s"),
-                    (ticker.upper(), ))
+def get_twitter_posts(ticker, end_date=None):
+    if not end_date:
+        end_date = '0000-00-00'
+    return __exec(("SELECT post_content, post_date, post_sentiment FROM twitter_post "
+                    "WHERE post_ticker = %s and post_date >= %s ORDER BY post_date DESC"),
+                    (ticker.upper(), end_date))

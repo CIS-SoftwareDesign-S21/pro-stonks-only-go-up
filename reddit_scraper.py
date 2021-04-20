@@ -135,7 +135,9 @@ def hasContent(submission, api):
 
 def limitRate(startTime, requests):
     maxRPM = 120
-    rpm = requests / ((time.time() - startTime) / 60)
+    rpm = 0
+    if time.time() - startTime > 0:
+        rpm = requests / ((time.time() - startTime) / 60)
     print("RPM: ", str(rpm))
     while rpm > maxRPM:
         print("RPM: ", str(rpm))
