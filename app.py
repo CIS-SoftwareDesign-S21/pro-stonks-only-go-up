@@ -73,7 +73,7 @@ fig.update_layout(
 #############################################################################################
 
 
-app.layout = html.Div(style={"margin": "0px"}, children=[
+app.layout = html.Div(style={"margin": "10px"}, children=[
     
     html.Div([
         #html.H1("Stonks Only Go Up"),
@@ -96,10 +96,10 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
     dcc.Graph(id='Historical', style={"border": "5px solid #4d8eff"}),
 
     html.H3("Sentiment since 2021-02-20"),
-    dcc.Graph(figure=fig),
+    dcc.Graph(figure=fig, style={"border": "5px solid #4d8eff"}),
     
     # searching interface
-    html.H2('Most Recent Relevant Posts (100+ upvotes)'),
+    html.H2('Most Recent Relevant Posts'),
     dcc.Dropdown(
         id='scraper-platform',
         options=[
