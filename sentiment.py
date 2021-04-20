@@ -19,6 +19,7 @@ t = 1618358400
 # df9 = pd.DataFrame(reddit_scraper.search_pushshift_titles('SNDL',100,0),columns = ['Title','Context','Timestamp'])
 # df10 = pd.DataFrame(reddit_scraper.search_pushshift_titles('PTON',100,0),columns = ['Title','Context','Timestamp'])
 
+
 df = pd.DataFrame(reddit_scraper.search_pushshift_titles_timeframe('GME',t,s),columns = ['Title','Context','Timestamp'])
 df2 = pd.DataFrame(reddit_scraper.search_pushshift_titles_timeframe('TSLA',t,s),columns = ['Title','Context','Timestamp'])
 df3 = pd.DataFrame(reddit_scraper.search_pushshift_titles_timeframe('AMC',t,s),columns = ['Title','Context','Timestamp'])
@@ -54,10 +55,13 @@ for post in df_total.index:
 
 # df_total.to_csv('Sentiment.CSV',index=False)
 
+
+#Functions below were for lemmatizing then rejoining the data into sentences. The performance was not as good.
+
 # nlp = spacy.load("en_core_web_sm")
 # df_total2['Clean Context'] = df_total2['Context'].apply(lemmatize)
 
-#intenal function
+# internal function
 # def lemmatize(text):
 #     context = nlp(text)
 #     lemma_list = [str(tok.lemma_).lower() for tok in context
