@@ -5,8 +5,8 @@ import spacy
 from nltk.sentiment.vader import SentimentIntensityAnalyzer as SIA
 import time
 
-s = 1609544966
-t = int(time.time())
+s = 1617580800
+t = 1618358400
 
 # df = pd.DataFrame(reddit_scraper.search_pushshift_titles('GME',100,0),columns = ['Title','Context','Timestamp'])
 # df2 = pd.DataFrame(reddit_scraper.search_pushshift_titles('TSLA',100,0),columns = ['Title','Context','Timestamp'])
@@ -48,10 +48,11 @@ df_total = df_total.replace('[^a-zA-Z ]', ' ', regex=True)
 sia = SIA()
 
 df_total['Compound'] = [sia.polarity_scores(x)['compound'] for x in df_total['Context']]
-print(df.info())
+# print(df.info())
+for post in df_total.index:
+    dbconn.insert_reddit_post(df_total['Ticker'][post],df_total['Title'][post],df_total['Context'][post],time.strftime("%Y-%m-%d", time.gmtime(df_total['Timestamp'][post].item())),df_total['Compound'][post].item())
 
-
-df_total.to_csv('Sentiment.CSV',index=False)
+# df_total.to_csv('Sentiment.CSV',index=False)
 
 # nlp = spacy.load("en_core_web_sm")
 # df_total2['Clean Context'] = df_total2['Context'].apply(lemmatize)

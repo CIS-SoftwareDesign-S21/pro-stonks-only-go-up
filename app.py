@@ -27,6 +27,52 @@ app.server.assets_folder = 'assets'
 
 server = app.server
 
+##################TEMPORARY###############################
+df_gme = pd.DataFrame(dbconn.get_reddit_posts('GME','2021-02-20'),columns=['Title','Context','Data','Score'])
+df_tsla = pd.DataFrame(dbconn.get_reddit_posts('TSLA','2021-02-20'),columns=['Title','Context','Data','Score'])
+df_amc = pd.DataFrame(dbconn.get_reddit_posts('AMC','2021-02-20'),columns=['Title','Context','Data','Score'])
+df_clov = pd.DataFrame(dbconn.get_reddit_posts('CLOV','2021-02-20'),columns=['Title','Context','Data','Score'])
+df_pltr = pd.DataFrame(dbconn.get_reddit_posts('PLTR','2021-02-20'),columns=['Title','Context','Data','Score'])
+df_aapl = pd.DataFrame(dbconn.get_reddit_posts('AAPL','2021-02-20'),columns=['Title','Context','Data','Score'])
+df_nio = pd.DataFrame(dbconn.get_reddit_posts('NIO','2021-02-20'),columns=['Title','Context','Data','Score'])
+df_sndl = pd.DataFrame(dbconn.get_reddit_posts('SNDL','2021-02-20'),columns=['Title','Context','Data','Score'])
+df_pton = pd.DataFrame(dbconn.get_reddit_posts('PTON','2021-02-20'),columns=['Title','Context','Data','Score'])
+df_gme.insert(0,'Ticker','GME')
+df_tsla.insert(0,'Ticker','TSLA')
+df_amc.insert(0,'Ticker','AMC')
+df_clov.insert(0,'Ticker','CLOV')
+df_pltr.insert(0,'Ticker','PLTR')
+df_aapl.insert(0,'Ticker','AAPL')
+df_nio.insert(0,'Ticker','NIO')
+df_sndl.insert(0,'Ticker','SNDL')
+df_pton.insert(0,'Ticker','PTON')
+
+Tickers = ['GME','GME','TSLA','TSLA','AMC','AMC','CLOV','CLOV','PLTR','PLTR','AAPL','AAPL','NIO','NIO','SNDL','SNDL','PTON','PTON']
+totals = []
+Sentiment = ['Postive','Negative','Postive','Negative','Postive','Negative','Postive','Negative','Postive','Negative','Postive','Negative','Postive','Negative','Postive','Negative','Postive','Negative']
+
+df_total = pd.concat([df_gme,df_tsla,df_amc,df_clov,df_pltr,df_aapl,df_nio,df_sndl,df_pton])
+
+df_total['label'] = 0
+df_total.loc[df_total['Score'] > 0.2, 'label'] = 1
+df_total.loc[df_total['Score'] < -0.2, 'label'] = -1
+
+for tickers in df_total.Ticker.unique():
+    totals.append(df_total[(df_total['Ticker']==tickers) & (df_total['label']==1)].label.count())
+    totals.append(df_total[(df_total['Ticker']==tickers) & (df_total['label']==-1)].label.count())
+
+fig = px.bar(x=Tickers, y=totals, color=Sentiment)
+
+fig.update_layout(
+    title="Sentiment and frequency over past month.",
+    xaxis_title="Tickers",
+    yaxis_title="Total Comments",
+    legend_title="Sentiment",
+)
+
+#############################################################################################
+
+
 app.layout = html.Div(style={"margin": "0px"}, children=[
     
     html.Div([
@@ -107,6 +153,7 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
     html.H3("Sentiment: ", id="scraper-sentiment"),
     dcc.Graph(
         id='scraper-graph',
+        figure=fig
     ),
     
     # database interface
@@ -199,7 +246,7 @@ def render_charts(stonk):
 # callback for scraper dropdown
 @app.callback(
     dash.dependencies.Output('scraper-sentiment', 'children'),
-    dash.dependencies.Output('scraper-graph', 'figure'),
+    # dash.dependencies.Output('scraper-graph', 'figure'),
     dash.dependencies.Output('scraper-listbox', 'children'),
     [dash.dependencies.Input('scraper-go', 'n_clicks')],
     [dash.dependencies.State('scraper-platform', 'value')],
@@ -232,7 +279,8 @@ def update_scraper_box(n_clicks, platform, ticker, n_days, n_posts):
     print('Updating table for scraper box')
     table = make_table(newPosts, platform)
 
-    return overall, fig, table
+    # return overall, fig, table
+    return overall, table
 
 
 # callback for save button
@@ -346,6 +394,49 @@ def sentiment_bar_graph(compound_scores):
 
     return sentiment, fig
 
+def generate_graph():
+    df_gme = pd.DataFrame(dbconn.get_reddit_posts('GME','2021-02-20'),columns=['Title','Context','Data','Score'])
+    df_tsla = pd.DataFrame(dbconn.get_reddit_posts('TSLA','2021-02-20'),columns=['Title','Context','Data','Score'])
+    df_amc = pd.DataFrame(dbconn.get_reddit_posts('AMC','2021-02-20'),columns=['Title','Context','Data','Score'])
+    df_clov = pd.DataFrame(dbconn.get_reddit_posts('CLOV','2021-02-20'),columns=['Title','Context','Data','Score'])
+    df_pltr = pd.DataFrame(dbconn.get_reddit_posts('PLTR','2021-02-20'),columns=['Title','Context','Data','Score'])
+    df_aapl = pd.DataFrame(dbconn.get_reddit_posts('AAPL','2021-02-20'),columns=['Title','Context','Data','Score'])
+    df_nio = pd.DataFrame(dbconn.get_reddit_posts('NIO','2021-02-20'),columns=['Title','Context','Data','Score'])
+    df_sndl = pd.DataFrame(dbconn.get_reddit_posts('SNDL','2021-02-20'),columns=['Title','Context','Data','Score'])
+    df_pton = pd.DataFrame(dbconn.get_reddit_posts('PTON','2021-02-20'),columns=['Title','Context','Data','Score'])
+    df_gme.insert(0,'Ticker','GME')
+    df_tsla.insert(0,'Ticker','TSLA')
+    df_amc.insert(0,'Ticker','AMC')
+    df_clov.insert(0,'Ticker','CLOV')
+    df_pltr.insert(0,'Ticker','PLTR')
+    df_aapl.insert(0,'Ticker','AAPL')
+    df_nio.insert(0,'Ticker','NIO')
+    df_sndl.insert(0,'Ticker','SNDL')
+    df_pton.insert(0,'Ticker','PTON')
+
+    Tickers = ['GME','GME','TSLA','TSLA','AMC','AMC','CLOV','CLOV','PLTR','PLTR','AAPL','AAPL','NIO','NIO','SNDL','SNDL','PTON','PTON']
+    totals = []
+    Sentiment = ['Postive','Negative','Postive','Negative','Postive','Negative','Postive','Negative','Postive','Negative','Postive','Negative','Postive','Negative','Postive','Negative','Postive','Negative']
+
+    df_total = pd.concat([df_gme,df_tsla,df_amc,df_clov,df_pltr,df_aapl,df_nio,df_sndl,df_pton])
+
+    df_total['label'] = 0
+    df_total.loc[df_total['Score'] > 0.2, 'label'] = 1
+    df_total.loc[df_total['Score'] < -0.2, 'label'] = -1
+
+    for tickers in df_total.Ticker.unique():
+      totals.append(df_total[(df_total['Ticker']==tickers) & (df_total['label']==1)].label.count())
+      totals.append(df_total[(df_total['Ticker']==tickers) & (df_total['label']==-1)].label.count())
+
+    fig = px.bar(x=Tickers, y=totals, color=Sentiment,
+                labels={
+                    Tickers:"Tickers",
+                    totals:"Total posts",
+                    Sentiment:"Sentiment"
+                },
+                title='Sentiment score and frequency over past month.')
+
+    return fig
 
 # def create_footer():
 #     footer_style= {"background-color": "green", "padding": "0.5rem"}
@@ -375,7 +466,6 @@ def sentiment_bar_graph(compound_scores):
 #     div = html.Div([p0, p1, a_fa])
 #     footer = html.Footer(children = div, style=footer_style)
 #     return footer
-
 
 if __name__ == '__main__':
     app.run_server(debug=True)
