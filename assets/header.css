@@ -43,13 +43,13 @@
 }
 
 .footer h5{
-    background-color: black;
+    background-color: none;
     color: rgb(47, 245, 196);
 }
 
-/* .footer Img {
+.footer Img {
     position: relative;
-    float: right;
-    height: 75px;
+    float: left;
+    height: 100px;
     right: 10px;
-} */
+} 
