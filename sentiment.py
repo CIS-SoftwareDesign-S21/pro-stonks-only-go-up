@@ -51,7 +51,7 @@ df_total['Compound'] = [sia.polarity_scores(x)['compound'] for x in df_total['Co
 print(df.info())
 
 
-df_total.to_csv('Sentiment2.CSV',index=False)
+df_total.to_csv('Sentiment.CSV',index=False)
 
 # nlp = spacy.load("en_core_web_sm")
 # df_total2['Clean Context'] = df_total2['Context'].apply(lemmatize)
