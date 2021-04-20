@@ -100,7 +100,7 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
     html.Div("Fetching posts...", id='scraper-listbox', style={"maxHeight": "400px", "overflow": "scroll"}),
     
     # save scraped data
-    html.Button('Save', id='save-button'),
+    html.Button('Save To Database', id='save-button'),
     html.Span(id='save-result'),
 
     # graph scraped sentiment
@@ -132,11 +132,13 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
     dcc.Dropdown(
         id='db-time',
         options=[
-            {'label': '6 months', 'value': '186'},
-            {'label': '3 months', 'value': '93'},
-            {'label': '1 month', 'value': '31'},
-            {'label': '2 weeks', 'value': '14'},
+            {'label': 'Today', 'value': '0'},
             {'label': '1 week', 'value': '7'},
+            {'label': '2 weeks', 'value': '14'},
+            {'label': '1 month', 'value': '31'},
+            {'label': '3 months', 'value': '93'},
+            {'label': '6 months', 'value': '186'},
+            {'label': 'Forever', 'value': '-1'},    
         ],
         value='7',
         style={"display": "inline-block", "width": "200px"}
@@ -246,7 +248,7 @@ def save_posts(n_clicks, table, ticker, platform):
         tableBody = table['props']['children'][1]
         for tableRow in tableBody['props']['children']:
             tds = tableRow['props']['children']
-            dbconn.insert_reddit_post(ticker, tds[0]['props']['children'], tds[1]['props']['children'])
+            dbconn.insert_reddit_post(ticker, tds[1]['props']['children'], tds[2]['props']['children'], tds[0]['props']['children'], tds[3]['props']['children'])
             # TODO: IMPLEMENT TWITTER
             # if platform == 'reddit':
             #     dbconn.insert_reddit_post(ticker, tds[0]['props']['children'], tds[1]['props']['children'])
@@ -269,7 +271,10 @@ def save_posts(n_clicks, table, ticker, platform):
 )
 def update_db_box(n_clicks, platform, ticker, n_days):
     print("Searching for " + ticker + " from " + platform + " in db...")
-    newPosts = dbconn.get_reddit_posts(ticker)
+    if n_days == '-1':
+        newPosts = dbconn.get_reddit_posts(ticker)
+    else:
+        newPosts = dbconn.get_reddit_posts(ticker, time.strftime("%Y-%m-%d", time.gmtime(time.time() - int(n_days) * 86400)))    
     # TODO: IMPLEMENT TWITTER
     # if platform == 'reddit':
     #     newPosts = dbconn.get_reddit_posts(ticker)
