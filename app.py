@@ -80,17 +80,10 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
         # html.Img(src="/assets/stonksgif.gif")
     ], className="banner"),
     
-    #html.H1(children='Stonks only go Up', className="app-header--title"),
-    
     #html.Img(src=app.get_asset_url('stonks.jpg'), style = {'padding-left': '90%', 'height': '10%', 'width': '10%', 'display': 'inline-block'}),
     html.H1('Stonks Only Go Up'),
     html.H3(children='Social Media Sentiment and Historical Prices of Stonks'),
 
-    # dcc.Input(
-    #     id="input_text",
-    #     type="text",
-    #     placeholder="input type text",
-    # ),
     dcc.RadioItems(
         id='Stonks',
         options=[
@@ -101,9 +94,12 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
         labelStyle={'display': 'inline-block', 'color': 'white'}
     ),
     dcc.Graph(id='Historical', style={"border": "5px solid #4d8eff"}),
+
+    html.H3("Sentiment since 2021-02-20"),
+    dcc.Graph(figure=fig),
     
     # searching interface
-    html.H2('Most Recent Relevant Posts'),
+    html.H2('Most Recent Relevant Posts (100+ upvotes)'),
     dcc.Dropdown(
         id='scraper-platform',
         options=[
@@ -117,7 +113,14 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
         id='scraper-ticker',
         options=[
             {'label': 'Gamestop', 'value': 'gme'},
-            {'label': 'Tesla', 'value': 'tsla'}
+            {'label': 'Tesla', 'value': 'tsla'},
+            {'label': 'AMC', 'value': 'amc'},
+            {'label': 'Clover', 'value': 'clov'},
+            {'label': 'Palantir', 'value': 'pltr'},
+            {'label': 'Apple', 'value': 'aapl'},
+            {'label': 'Nio', 'value': 'nio'},
+            {'label': 'Sundial', 'value': 'sndl'},
+            {'label': 'Peloton', 'value': 'pton'}
         ],
         value='gme',
         style={"display": "inline-block", "width": "200px", "color": "black"}
@@ -151,10 +154,7 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
 
     # graph scraped sentiment
     html.H3("Sentiment: ", id="scraper-sentiment"),
-    dcc.Graph(
-        id='scraper-graph',
-        figure=fig
-    ),
+    dcc.Graph(id='scraper-graph'),
     
     # database interface
     html.H2('Posts stored in Database'),
@@ -171,7 +171,14 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
         id='db-ticker',
         options=[
             {'label': 'Gamestop', 'value': 'gme'},
-            {'label': 'Tesla', 'value': 'tsla'}
+            {'label': 'Tesla', 'value': 'tsla'},
+            {'label': 'AMC', 'value': 'amc'},
+            {'label': 'Clover', 'value': 'clov'},
+            {'label': 'Palantir', 'value': 'pltr'},
+            {'label': 'Apple', 'value': 'aapl'},
+            {'label': 'Nio', 'value': 'nio'},
+            {'label': 'Sundial', 'value': 'sndl'},
+            {'label': 'Peloton', 'value': 'pton'}
         ],
         value='gme',
         style={"display": "inline-block", "width": "200px", "color": "black"}
@@ -195,9 +202,7 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
     
     # graph stored sentiment
     html.H3("Sentiment: ", id="db-sentiment"),
-    dcc.Graph(
-        id='db-graph',
-    ),
+    dcc.Graph(id='db-graph'),
 
     # footer
     html.Div(children=[
@@ -246,12 +251,12 @@ def render_charts(stonk):
 # callback for scraper dropdown
 @app.callback(
     dash.dependencies.Output('scraper-sentiment', 'children'),
-    # dash.dependencies.Output('scraper-graph', 'figure'),
+    dash.dependencies.Output('scraper-graph', 'figure'),
     dash.dependencies.Output('scraper-listbox', 'children'),
     [dash.dependencies.Input('scraper-go', 'n_clicks')],
     [dash.dependencies.State('scraper-platform', 'value')],
     [dash.dependencies.State('scraper-ticker', 'value')],
-    [dash.dependencies.State('scraper-time', 'value')], # TODO: QUERY API FOR POSTS IN TIMEFRAME
+    [dash.dependencies.State('scraper-time', 'value')],
     [dash.dependencies.State('scraper-quantity', 'value')]
 )
 def update_scraper_box(n_clicks, platform, ticker, n_days, n_posts):
@@ -279,8 +284,8 @@ def update_scraper_box(n_clicks, platform, ticker, n_days, n_posts):
     print('Updating table for scraper box')
     table = make_table(newPosts, platform)
 
-    # return overall, fig, table
-    return overall, table
+    return overall, fig, table
+    # return overall, table
 
 
 # callback for save button
@@ -317,21 +322,21 @@ def save_posts(n_clicks, table, ticker, platform):
     [dash.dependencies.Input('db-go', 'n_clicks')],
     [dash.dependencies.State('db-platform', 'value')],
     [dash.dependencies.State('db-ticker', 'value')],
-    [dash.dependencies.State('db-time', 'value')] # TODO: QUERY DATABASE FOR POSTS IN TIME FRAME
+    [dash.dependencies.State('db-time', 'value')]
 )
 def update_db_box(n_clicks, platform, ticker, n_days):
     print("Searching for " + ticker + " from " + platform + " in db...")
     if n_days == '-1':
         newPosts = dbconn.get_reddit_posts(ticker)
     else:
-        newPosts = dbconn.get_reddit_posts(ticker, time.strftime("%Y-%m-%d", time.gmtime(time.time() - int(n_days) * 86400)))    
+        newPosts = dbconn.get_reddit_posts(ticker, time.strftime("%Y-%m-%d", time.gmtime(time.time() - int(n_days) * 86400)))   
     # TODO: IMPLEMENT TWITTER
     # if platform == 'reddit':
     #     newPosts = dbconn.get_reddit_posts(ticker)
     # elif platform == 'twitter':
     #     newPosts = dbconn.get_twitter_posts(ticker)
 
-    compound_scores = np.array(newPosts)[:, 3].astype(float)
+    compound_scores = np.array(newPosts).reshape(-1, 4)[:, 3].astype(float)
     overall, fig = sentiment_bar_graph(compound_scores)
 
     print("Updating table for db box")
@@ -341,7 +346,7 @@ def update_db_box(n_clicks, platform, ticker, n_days):
 
 
 # helper function to create html table
-def make_table(posts, platform): # TODO: UPDATE TABLE WITH DATE AND SENTIMENT
+def make_table(posts, platform):
     if platform == 'reddit':
         tableHead = html.Thead(html.Tr([html.Th("DATE"), html.Th("TITLE"), html.Th("CONTENT"), html.Th("SENTIMENT")]))
         tableBody = html.Tbody([html.Tr([html.Td(post[2]), html.Td(post[0]), html.Td(post[1]), html.Td(post[3])]) for post in posts])
@@ -393,6 +398,7 @@ def sentiment_bar_graph(compound_scores):
                     height=600)
 
     return sentiment, fig
+
 
 def generate_graph():
     df_gme = pd.DataFrame(dbconn.get_reddit_posts('GME','2021-02-20'),columns=['Title','Context','Data','Score'])
