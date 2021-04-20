@@ -54,10 +54,13 @@ for post in df_total.index:
 
 # df_total.to_csv('Sentiment.CSV',index=False)
 
+
+#Functions below were for lemmatizing then rejoining the data into sentences. The performance was not as good.
+
 # nlp = spacy.load("en_core_web_sm")
 # df_total2['Clean Context'] = df_total2['Context'].apply(lemmatize)
 
-#intenal function
+# internal function
 # def lemmatize(text):
 #     context = nlp(text)
 #     lemma_list = [str(tok.lemma_).lower() for tok in context
