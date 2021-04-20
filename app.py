@@ -84,7 +84,7 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
             {'label': '500 posts', 'value': '500'}
         ],
         value='50',
-        style={"display": "inline-block", "width": "200px"}
+        style={"display": "inline-block", "width": "200px", "color": "black"}
     ),
     html.Span('   Start searching from '),
     dcc.Input(
@@ -141,7 +141,7 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
             {'label': 'Forever', 'value': '-1'},    
         ],
         value='7',
-        style={"display": "inline-block", "width": "200px"}
+        style={"display": "inline-block", "width": "200px", "color": "black"}
     ),
     html.Button('Query Database', id='db-go'),
     html.Div('Fetching posts...', id='db-listbox', style={"maxHeight": "400px", "overflow": "scroll"}),
