@@ -264,7 +264,7 @@ def update_scraper_box(n_clicks, platform, ticker, n_days, n_posts):
     if not n_days:
         n_days = 0
     newPosts = reddit_scraper.search_pushshift_titles(ticker, int(n_posts), round(time.time() - int(n_days) * 86400))
-    #newPosts = reddit_scraper.search_pushshift_titles_timeframe(ticker, 0, 1603080000)  #   Oct 19, 2020
+    #newPosts = reddit_scraper.search_pushshift_titles_timeframe(ticker, 0, 1603080000, 0)  #   Oct 19, 2020
     # newPosts = reddit_scraper.search_reddit_titles(ticker)
 
     # TODO: IMPLEMENT TWITTER

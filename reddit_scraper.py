@@ -28,7 +28,7 @@ def search_pushshift_titles(ticker, size, timePage):
     if timePage == 0:
         timePage = round(time.time())
 
-    search_url = 'https://api.pushshift.io/reddit/search/submission/?title='+str(ticker)+'&size=100&score=>100&author=![deleted]&is_self=true&before='
+    search_url = 'https://api.pushshift.io/reddit/search/submission/?title='+str(ticker)+'&size=100&score=>0&author=![deleted]&is_self=true&before='
     i = 0
 
     reqs = 0
@@ -68,7 +68,7 @@ def search_pushshift_titles(ticker, size, timePage):
 
     return relevantData
 
-def search_pushshift_titles_timeframe(ticker, newTime, oldTime):
+def search_pushshift_titles_timeframe(ticker, newTime, oldTime, minScore):
     relevantData = []
     
     startTime = time.time()
@@ -76,7 +76,7 @@ def search_pushshift_titles_timeframe(ticker, newTime, oldTime):
     if newTime == 0:
         newTime = round(startTime)
 
-    search_url = 'https://api.pushshift.io/reddit/search/submission/?title='+str(ticker)+'&size=100&score=>100&author=![deleted]&is_self=true&before='+str(newTime)+'&after='
+    search_url = 'https://api.pushshift.io/reddit/search/submission/?title='+str(ticker)+'&size=100&score=>'+str(minScore)+'&author=![deleted]&is_self=true&before='+str(newTime)+'&after='
     i = 0
 
     reqs = 0
@@ -110,7 +110,12 @@ def search_pushshift_titles_timeframe(ticker, newTime, oldTime):
             print("Out of posts!")
             break
 
-        oldTime = round(data["data"][-1]["created_utc"])
+        if len(data["data"]) > 0:
+            oldTime = round(data["data"][-1]["created_utc"])
+        else:
+            if len(relevantData) == 0:
+                return None
+        
         print("Current posts: "+str(i))
         
     print("Got data of size: " + str(len(relevantData)))
