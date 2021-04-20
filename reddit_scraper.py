@@ -76,7 +76,7 @@ def search_pushshift_titles_timeframe(ticker, newTime, oldTime):
     if newTime == 0:
         newTime = round(startTime)
 
-    search_url = 'https://api.pushshift.io/reddit/search/submission/?title='+str(ticker)+'&size=100&score=>100&author=![deleted]&is_self=true&before='+str(newTime)+'&after='
+    search_url = 'https://api.pushshift.io/reddit/search/submission/?title='+str(ticker)+'&size=100&score=>10&author=![deleted]&is_self=true&before='+str(newTime)+'&after='
     i = 0
 
     reqs = 0

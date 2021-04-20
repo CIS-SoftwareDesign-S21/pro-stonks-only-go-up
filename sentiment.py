@@ -5,7 +5,7 @@ import spacy
 from nltk.sentiment.vader import SentimentIntensityAnalyzer as SIA
 import time
 
-s = 1609544966
+s = 1609470783
 t = int(time.time())
 
 # df = pd.DataFrame(reddit_scraper.search_pushshift_titles('GME',100,0),columns = ['Title','Context','Timestamp'])
