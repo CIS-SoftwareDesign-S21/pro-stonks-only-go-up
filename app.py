@@ -65,7 +65,7 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
             {'label': 'Twitter', 'value': 'twitter'}
         ],
         value='reddit',
-        style={"display": "inline-block", "width": "200px"}
+        style={"display": "inline-block", "width": "200px", "color": "black"}
     ),
     dcc.Dropdown(
         id='scraper-ticker',
@@ -74,7 +74,7 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
             {'label': 'Tesla', 'value': 'tsla'}
         ],
         value='gme',
-        style={"display": "inline-block", "width": "200px"}
+        style={"display": "inline-block", "width": "200px", "color": "black"}
     ),
     dcc.Dropdown(
         id='scraper-quantity',
@@ -118,7 +118,7 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
             {'label': 'Twitter', 'value': 'twitter'}
         ],
         value='reddit',
-        style={"display": "inline-block", "width": "200px"}
+        style={"display": "inline-block", "width": "200px", "color": "black"}
     ),
     dcc.Dropdown(
         id='db-ticker',
@@ -127,7 +127,7 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
             {'label': 'Tesla', 'value': 'tsla'}
         ],
         value='gme',
-        style={"display": "inline-block", "width": "200px"}
+        style={"display": "inline-block", "width": "200px", "color": "black"}
     ),
     dcc.Dropdown(
         id='db-time',
@@ -155,7 +155,7 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
     # footer
     html.Div(children=[
         html.Footer([
-            html.H3('Footer'),
+            html.Img(src="/assets/stonksgif.gif"),
             html.H5("Created By: Ayman El-sayed 🌑 Steven Zhou 🌑 Aidan Buehler 🌑 Karl Schaller 🌑 Ji Park"),
             html.H5("Stonks Only Go Up ©️ 2021"),
         ])
@@ -212,7 +212,9 @@ def update_scraper_box(n_clicks, platform, ticker, n_days, n_posts):
     if not n_days:
         n_days = 0
     newPosts = reddit_scraper.search_pushshift_titles(ticker, int(n_posts), round(time.time() - int(n_days) * 86400))
+    #newPosts = reddit_scraper.search_pushshift_titles_timeframe(ticker, 0, 1603080000)  #   Oct 19, 2020
     # newPosts = reddit_scraper.search_reddit_titles(ticker)
+
     # TODO: IMPLEMENT TWITTER
     # if platform == 'reddit':
     #     newPosts = reddit_scraper.search_pushshift_titles(ticker, 100, 0)
