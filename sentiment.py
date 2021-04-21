@@ -5,8 +5,8 @@ import spacy
 from nltk.sentiment.vader import SentimentIntensityAnalyzer as SIA
 import time
 
-s = 1617580800
-t = 1618358400
+s = 1609459200
+t = 1618941644
 
 # df = pd.DataFrame(reddit_scraper.search_pushshift_titles('GME',100,0),columns = ['Title','Context','Timestamp'])
 # df2 = pd.DataFrame(reddit_scraper.search_pushshift_titles('TSLA',100,0),columns = ['Title','Context','Timestamp'])
@@ -21,7 +21,7 @@ t = 1618358400
 
 df = pd.DataFrame(reddit_scraper.search_pushshift_titles_timeframe('GME',t,s,100),columns = ['Title','Context','Timestamp'])
 df2 = pd.DataFrame(reddit_scraper.search_pushshift_titles_timeframe('TSLA',t,s,0),columns = ['Title','Context','Timestamp'])
-df3 = pd.DataFrame(reddit_scraper.search_pushshift_titles_timeframe('AMC',t,s,0),columns = ['Title','Context','Timestamp'])
+df3 = pd.DataFrame(reddit_scraper.search_pushshift_titles_timeframe('AMC',t,s,50),columns = ['Title','Context','Timestamp'])
 df4 = pd.DataFrame(reddit_scraper.search_pushshift_titles_timeframe('CLOV',t,s,0),columns = ['Title','Context','Timestamp'])
 df5 = pd.DataFrame(reddit_scraper.search_pushshift_titles_timeframe('PLTR',t,s,0),columns = ['Title','Context','Timestamp'])
 df6 = pd.DataFrame(reddit_scraper.search_pushshift_titles_timeframe('AAPL',t,s,0),columns = ['Title','Context','Timestamp'])

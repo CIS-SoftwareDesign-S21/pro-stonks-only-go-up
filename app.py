@@ -216,18 +216,30 @@ app.layout = html.Div(style={"margin": "0px"}, children=[
 def render_charts(stonk):
 
     df = pd.read_csv(r'GME.csv')
+    df_newdate = df[(df['Date'] > '2021-01-01') & (df['Date'] < '2021-04-20')]
+
     df2 = pd.read_csv(r'TSLA.csv')
+
+    df_gme = pd.DataFrame(dbconn.get_reddit_posts('GME'),columns=['Title','Context','Date','Score'])
+    df_sent = df_gme.groupby('Date')['Score'].sum()
+    df_sent = df_sent.reset_index()
+    df_sent['Score'] = df_sent['Score'].astype('float')
+    df_sent['Score']= df_sent['Score']/df_sent['Score'].max()
 
     fig = go.Figure()
     fig2 = go.Figure()
+    gme_mid = df['Close'].max()/2
 
-    fig.add_trace(go.Scatter(x=df['Date'], y=df['Close'],
+    fig.add_trace(go.Scatter(x=df_newdate['Date'], y=df_newdate['Close'],
                              mode='lines',
                              name='GME'))
-    fig.add_trace(go.Scatter(x=df2['Date'], y=np.random.rand(len(df['Date']))*df['Close'].max(),
+    fig.add_trace(go.Scatter(x=df_sent['Date'], y=(df_sent['Score'].astype('float')*gme_mid)+gme_mid,
                              mode='lines',
                              name='Sentiment',
-                             opacity=0.3))
+                             opacity=0.3,
+                             connectgaps=False))
+
+    fig.add_hline(y=gme_mid)
 
     fig2.add_trace(go.Scatter(x=df2['Date'], y=df2['Close'],
                               mode='lines',
